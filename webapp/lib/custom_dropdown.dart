@@ -353,7 +353,7 @@ class _DropdownOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     final dropdownData = DropdownData.of(context);
     return Container(
-      height: height,
+      height: height + 5,
       child: Material(
         // If the overlay is on bottom display an elevation
         elevation: _kOpenElevation,
@@ -441,7 +441,7 @@ class _DropdownItemWidget extends StatelessWidget {
           item.text,
           style: TextStyle(
             color: DropdownData.of(context).elementTextColor,
-            fontSize: 20,
+            fontSize: 18,
           ),
         ),
       ),

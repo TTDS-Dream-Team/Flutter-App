@@ -103,7 +103,7 @@ class _BasePageState extends State<BasePage> {
                   );
                 }),
           PageView(
-            //physics: NeverScrollableScrollPhysics(),
+            physics: NeverScrollableScrollPhysics(),
             controller: contrcontr.controller,
             scrollDirection: Axis.vertical,
             children: [HomePage(contrcontr), SearchResults(contrcontr)],

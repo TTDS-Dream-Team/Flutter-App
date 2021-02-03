@@ -313,9 +313,7 @@ Widget starSideGreyBox(QueryResultEntry e, bool isExpanded) {
           starWidget(e.avgRating),
           Text("${e.avgRating}/5", style: quoteStyle),
           Text("(${oCcy.format(e.numReviews)} reviews)", style: reviewsStyle),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Wrap(
             children: [
               Text("Ranked ", style: genreStyle),
               Text("#${e.genreRanking} ", style: boldGenreStyle),
