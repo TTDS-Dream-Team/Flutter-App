@@ -1,4 +1,6 @@
+import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_xlider/flutter_xlider.dart';
 
 import 'HomePage.dart';
 import 'Utils.dart';
@@ -81,13 +83,203 @@ class SearchResults extends StatelessWidget {
   }
 }
 
-class SearchFilters extends StatelessWidget {
+class SearchFilters extends StatefulWidget {
+  @override
+  _SearchFiltersState createState() => _SearchFiltersState();
+}
+
+class _SearchFiltersState extends State<SearchFilters> {
+  double _lowerStars = 0;
+  double _upperStars = 10;
+  double _lowerYear = 1950;
+  double _upperYear = 2021;
+
   @override
   Widget build(BuildContext context) {
+    var handleDecor = BoxDecoration(
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black54,
+          blurRadius: 3,
+          spreadRadius: 0.2,
+          offset: Offset(0, 1),
+        )
+      ],
+      color: Colors.white,
+      shape: BoxShape.circle,
+    );
     return Container(
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.all(20),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(10))),
-        child: Logo(fontSize: 60.0));
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ExpandablePanel(
+              header: Column(
+                children: [
+                  Divider(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Rating", style: bookTitleStyle),
+                      Text("${_lowerStars / 2} - ${_upperStars / 2}", style: authorStyle)
+                    ],
+                  ),
+                ],
+              ),
+              collapsed: Container(),
+              expanded: FlutterSlider(
+                tooltip: FlutterSliderTooltip(disabled: true),
+                values: [_lowerStars, _upperStars],
+                rangeSlider: true,
+                max: 10.0,
+                min: 0.0,
+                handler: FlutterSliderHandler(
+                  child: Text("${_lowerStars / 2}", style: bookTitleStyle.copyWith(fontSize: 18)),
+                  decoration: handleDecor,
+                ),
+                rightHandler: FlutterSliderHandler(
+                  child: Text("${_upperStars / 2}", style: bookTitleStyle.copyWith(fontSize: 18)),
+                  decoration: handleDecor,
+                ),
+                hatchMark: FlutterSliderHatchMark(
+                  density: 0.5,
+                  displayLines: true,
+                  smallLine: FlutterSliderSizedBox(width: 1, height: 1),
+                ),
+                onDragging: (handlerIndex, lowerValue, upperValue) {
+                  _lowerStars = lowerValue;
+                  _upperStars = upperValue;
+                  setState(() {});
+                },
+              ),
+            ),
+            Divider(color: Colors.black54),
+            ExpandablePanel(
+              header: Column(
+                children: [
+                  Divider(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Year of Release", style: bookTitleStyle),
+                      Text("${_lowerYear.toInt()} - ${_upperYear.toInt()}", style: authorStyle)
+                    ],
+                  ),
+                ],
+              ),
+              collapsed: Container(),
+              expanded: Column(
+                children: [
+                  FlutterSlider(
+                    tooltip: FlutterSliderTooltip(disabled: true),
+                    values: [_lowerYear, _upperYear],
+                    rangeSlider: true,
+                    max: 2021,
+                    min: 1950,
+                    handler: FlutterSliderHandler(
+                      child: Text("'${"$_lowerYear".substring(2, 4)}", style: bookTitleStyle.copyWith(fontSize: 18)),
+                      decoration: handleDecor,
+                    ),
+                    rightHandler: FlutterSliderHandler(
+                      child: Text("'${"$_upperYear".substring(2, 4)}", style: bookTitleStyle.copyWith(fontSize: 18)),
+                      decoration: handleDecor,
+                    ),
+                    hatchMark: FlutterSliderHatchMark(
+                      density: 0.5,
+                      displayLines: true,
+                      smallLine: FlutterSliderSizedBox(width: 1, height: 1),
+                    ),
+                    onDragging: (handlerIndex, lowerValue, upperValue) {
+                      _lowerYear = lowerValue;
+                      _upperYear = upperValue;
+                      setState(() {});
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Divider(color: Colors.black54),
+            ExpandablePanel(
+              header: Column(
+                children: [
+                  Divider(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Genre", style: bookTitleStyle),
+                    ],
+                  ),
+                ],
+              ),
+              collapsed: Container(),
+              expanded: GenreGrid(),
+            ),
+            Divider(color: Colors.black54),
+            Center(child: Logo(fontSize: 40.0)),
+          ],
+        ));
+  }
+}
+
+class GenreGrid extends StatefulWidget {
+  @override
+  _GenreGridState createState() => _GenreGridState();
+}
+
+class _GenreGridState extends State<GenreGrid> {
+  var allValues = {
+    "Action": false,
+    "Adventure": false,
+    "Biography": false,
+    "Children": false,
+    "Classic": false,
+    "Comedy/Humour": true,
+    "Detective": false,
+    "Drama": false,
+    "Education": true,
+    "Fantasy": false,
+    "Fiction": false,
+    "History": false,
+    "Horror": false,
+    "Mystery": false,
+    "Non-fiction": false,
+    "Politics": false,
+    "Romance": false,
+    "Scientific": false,
+    "Sci-fi": false,
+    "Young Adult": false,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    var numRows = allValues.keys.length ~/ 2;
+    List<Widget> columns = [];
+    for (int j = 0; j < 2; j++) {
+      List<Widget> rows = [];
+      for (int i = 0; i < numRows; i++) {
+        var key = allValues.keys.toList()[i + numRows * j];
+        rows.add(Row(children: [
+          Checkbox(
+              checkColor: Colors.white,
+              activeColor: primaryColor,
+              value: allValues[key],
+              onChanged: (newV) {
+                allValues[key] = newV;
+                setState(() {});
+              }),
+          Text(key, style: authorStyle),
+        ]));
+      }
+      columns.add(Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: rows,
+      ));
+    }
+
+    return Row(
+      children: columns,
+    );
   }
 }
 

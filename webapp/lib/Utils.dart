@@ -28,6 +28,7 @@ Widget starWidget(double rating) {
   }
   return Row(
     mainAxisAlignment: MainAxisAlignment.center,
+    mainAxisSize: MainAxisSize.min,
     children: stars,
   );
 }
