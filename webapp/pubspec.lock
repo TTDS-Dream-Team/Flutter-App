@@ -15,6 +15,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.40.6"
+  animated_clipper:
+    dependency: "direct main"
+    description:
+      name: animated_clipper
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.6+2"
+  anitex:
+    dependency: "direct main"
+    description:
+      name: anitex
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0"
   archive:
     dependency: transitive
     description:
@@ -113,13 +127,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.0.2"
-  expandable:
-    dependency: "direct main"
-    description:
-      name: expandable
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.1.4"
   fake_async:
     dependency: transitive
     description:

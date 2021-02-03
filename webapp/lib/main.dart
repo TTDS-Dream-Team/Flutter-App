@@ -22,8 +22,8 @@ double cornerRadius = 25;
 
 final numberStyle = TextStyle(fontSize: 14.0, fontStyle: FontStyle.italic, color: textColor)
     .copyWith(fontSize: 30, fontStyle: FontStyle.normal);
-final bookTitleStyle = numberStyle.copyWith(fontSize: 24, fontStyle: FontStyle.normal);
-final authorStyle = numberStyle.copyWith(fontSize: 20, fontStyle: FontStyle.normal);
+final bookTitleStyle = numberStyle.copyWith(fontSize: 20, fontStyle: FontStyle.normal);
+final authorStyle = numberStyle.copyWith(fontSize: 17, fontStyle: FontStyle.normal);
 final reviewsStyle = numberStyle.copyWith(fontSize: 12, fontStyle: FontStyle.normal);
 final genreStyle = numberStyle.copyWith(fontSize: 14, fontStyle: FontStyle.normal, color: Colors.grey[800]);
 final boldGenreStyle = genreStyle.copyWith(fontWeight: FontWeight.bold, color: Colors.grey[800]);

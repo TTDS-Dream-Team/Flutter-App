@@ -1,4 +1,3 @@
-import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 
 import 'HomePage.dart';
@@ -103,19 +102,20 @@ class SearchResultsList extends StatelessWidget {
       children: results.asMap().entries.map((entry) {
         int idx = entry.key;
         var e = entry.value;
-        return bookPanel(context, idx == results.length - 1, e);
+        return BookPanel(idx == results.length - 1, e);
       }).toList(),
     );
   }
 }
 
-Widget starSideGreyBox(QueryResultEntry e) {
-  return Container(
-      padding: EdgeInsets.all(10),
+Widget starSideGreyBox(QueryResultEntry e, bool isExpanded) {
+  return AnimatedContainer(
+      padding: EdgeInsets.symmetric(vertical: isExpanded ? 30 : 10, horizontal: 10),
       decoration: BoxDecoration(
           boxShadow: [BoxShadow(blurRadius: 1, offset: Offset(0, 5), spreadRadius: -2, color: Color(0x77000000))],
           color: Color(0xffeeeeee),
           borderRadius: BorderRadius.all(Radius.circular(10))),
+      duration: Duration(milliseconds: 200),
       child: Column(
         children: [
           starWidget(e.avgRating),
@@ -165,49 +165,126 @@ Widget bookPanelContainer(bool isLast, int idx, Widget child) {
   );
 }
 
-Widget bookPanel(BuildContext context, bool isLast, QueryResultEntry e) {
-  return bookPanelContainer(
-      isLast,
-      e.searchResultNum,
-      Container(
-          padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(topRight: Radius.circular(10), bottomRight: Radius.circular(10))),
-          child: ExpandablePanel(
-              expanded: bookPanelContents(
-                  e,
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(text1, style: quoteStyle),
-                      Text(text1, style: quoteStyle),
-                      Text(text1, style: quoteStyle),
-                    ],
-                  ),
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Text("Collapse", style: expandStyle),
-                    SizedBox(width: 5),
-                    Icon(Icons.remove_circle_outline_outlined, color: primaryColor)
-                  ])),
-              collapsed: bookPanelContents(
-                  e,
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("...knock your socks off, couldn't put it down...", style: quoteStyle),
-                      Text("...you’ll absolutely laugh your socks off...", style: quoteStyle),
-                      Text("...blew my socks off. Best thing I’ve read in years...", style: quoteStyle)
-                    ],
-                  ),
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Text("Expand", style: expandStyle),
-                    SizedBox(width: 5),
-                    Icon(Icons.add_circle_outline_outlined, color: primaryColor)
-                  ])))));
+class BookPanel extends StatefulWidget {
+  BookPanel(this.isLast, this.e);
+  final bool isLast;
+  final QueryResultEntry e;
+  @override
+  _BookPanelState createState() => _BookPanelState();
 }
 
-Widget bookPanelContents(QueryResultEntry e, Widget child, Widget expandyWidget) {
+class _BookPanelState extends State<BookPanel> with TickerProviderStateMixin {
+  bool isExpanded = false;
+  AnimationController controller;
+  @override
+  void initState() {
+    super.initState();
+    controller = AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+    controller.forward();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return bookPanelContainer(
+        widget.isLast,
+        widget.e.searchResultNum,
+        Container(
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(topRight: Radius.circular(10), bottomRight: Radius.circular(10))),
+            child: AnimatedContainer(
+              duration: Duration(milliseconds: 200),
+              height: isExpanded ? 480 : 180,
+              child: bookPanelContents(
+                  widget.e,
+                  isExpanded,
+                  Container(
+                    decoration:
+                        BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(10)), color: Colors.grey[100]),
+                    margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                    padding: EdgeInsets.all(10),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AnimatedCrossFade(
+                          firstChild: Text("...knock your socks off, super-scorcher, couldn’t put it down...",
+                              overflow: TextOverflow.ellipsis, maxLines: 1, style: quoteStyle),
+                          secondChild: Text(
+                            text1,
+                            style: quoteStyle,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 6,
+                          ),
+                          crossFadeState: isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+                          duration: Duration(milliseconds: 200),
+                        ),
+                        Center(
+                            child: AnimatedContainer(
+                          padding: EdgeInsets.symmetric(vertical: isExpanded ? 10 : 2),
+                          duration: Duration(milliseconds: 200),
+                          child: AnimatedContainer(
+                              duration: Duration(milliseconds: 200),
+                              width: 200,
+                              height: isExpanded ? 2 : 1,
+                              color: textColor),
+                        )),
+                        AnimatedCrossFade(
+                          firstChild:
+                              Text("...you’ll absolutely laugh your socks off...", style: quoteStyle, maxLines: 1),
+                          secondChild: Text(
+                            text1,
+                            style: quoteStyle,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 6,
+                          ),
+                          crossFadeState: isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+                          duration: Duration(milliseconds: 200),
+                        ),
+                        Center(
+                            child: AnimatedContainer(
+                          padding: EdgeInsets.symmetric(vertical: isExpanded ? 10 : 2),
+                          duration: Duration(milliseconds: 200),
+                          child: AnimatedContainer(
+                              duration: Duration(milliseconds: 200),
+                              width: 200,
+                              height: isExpanded ? 2 : 1,
+                              color: textColor),
+                        )),
+                        AnimatedCrossFade(
+                          firstChild: Text("...blew my socks off. Best thing I’ve read in years...",
+                              style: quoteStyle, maxLines: 1),
+                          secondChild: Text(
+                            text1,
+                            style: quoteStyle,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 6,
+                          ),
+                          crossFadeState: isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+                          duration: Duration(milliseconds: 200),
+                        )
+                      ],
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        isExpanded = !isExpanded;
+                      });
+                    },
+                    child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      Text(isExpanded ? "Collapse" : "Expand", style: expandStyle),
+                      SizedBox(width: 5),
+                      Icon(isExpanded ? Icons.remove_circle_outline_outlined : Icons.add_circle_outline_outlined,
+                          color: primaryColor)
+                    ]),
+                  )),
+            )));
+  }
+}
+
+Widget bookPanelContents(QueryResultEntry e, bool isExpanded, Widget child, Widget expandyWidget) {
   return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
     Image(
       height: 180,
@@ -219,28 +296,31 @@ Widget bookPanelContents(QueryResultEntry e, Widget child, Widget expandyWidget)
     Expanded(
       flex: 7,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(e.title, style: bookTitleStyle),
+          Text(
+            e.title,
+            style: bookTitleStyle,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
           Text(e.author, style: authorStyle),
-          //Expanded(child: Container()),
           child,
         ],
       ),
     ),
+    SizedBox(width: 10),
     Expanded(
       flex: 3,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          starSideGreyBox(e),
-          //Expanded(child: Container()),
+          starSideGreyBox(e, isExpanded),
+          Expanded(child: Container()),
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 15.0, 0, 5.0),
-            child: ExpandableButton(
-              child: expandyWidget,
-            ),
+            child: expandyWidget,
           ),
         ],
       ),
