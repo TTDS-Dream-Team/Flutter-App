@@ -466,25 +466,18 @@ class _BookPanelState extends State<BookPanel> with TickerProviderStateMixin {
           newStart += 3;
           newEnd += 3;
         }
-        double widthGuess = constraint.minWidth / 2 - 20; // Fragile and horrible, but heyo
-        double textSize = _textSize(newText, quoteStyle, widthGuess).height;
-        if (textSize < 100 && widget.e.reviews.length == 1) {
-          canExpand = false;
-        }
-        children.add(AnimatedContainer(
-          duration: Duration(milliseconds: 200),
-          height: isExpanded ? textSize : 100,
-          child: RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(text: newText.substring(0, newStart)),
-                TextSpan(text: r.foundText, style: quoteStyle.copyWith(fontWeight: FontWeight.bold)),
-                TextSpan(text: newText.substring(newEnd))
-              ],
-              style: quoteStyle,
-            ),
-            maxLines: absolute_max_review_length,
+        // newText = newText.substring(0, newStart) + "<bold>" + r.foundText + "</bold>" + newText.substring(newEnd);
+        children.add(ConstrainedBox(
+          constraints: BoxConstraints(minHeight: 100),
+          child: Text.rich(
+            TextSpan(children: [
+              TextSpan(text: newText.substring(0, newStart)),
+              TextSpan(text: r.foundText, style: quoteStyle.copyWith(fontWeight: FontWeight.bold)),
+              TextSpan(text: newText.substring(newEnd))
+            ]),
+            style: quoteStyle,
             overflow: TextOverflow.ellipsis,
+            maxLines: isExpanded ? absolute_max_review_length : 5,
           ),
         ));
         if (i != children.length - 1) {
@@ -531,7 +524,7 @@ class _BookPanelState extends State<BookPanel> with TickerProviderStateMixin {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    Text(widget.e.author, style: authorStyle),
+                    Text("${widget.e.year}${widget.e.author}", style: authorStyle),
                     Container(
                       decoration:
                           BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(10)), color: Colors.grey[100]),

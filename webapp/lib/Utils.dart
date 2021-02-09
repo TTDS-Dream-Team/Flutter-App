@@ -37,10 +37,22 @@ List<QueryResultEntry> getQueries(String response) {
   List<QueryResultEntry> toRet = [];
   for (var r in responses.keys.toList()..sort()) {
     var res = responses[r];
+    String yearPublished = res["year_published"];
+    if (yearPublished.length != 0) yearPublished = yearPublished + ", ";
     List<ReviewResult> reviews = [];
     reviews.add(ReviewResult(res["text"], res["relevant_text"], res["relevant_range"][0], res["relevant_range"][1]));
     toRet.add(QueryResultEntry(
-        int.parse(r) + 1, res["title"], "No Author", 2020, 5.0, 0, "No Genre", 1, res["image"], reviews));
+      int.parse(r) + 1,
+      res["title"],
+      "No Author",
+      yearPublished,
+      res["average_rating"],
+      res["counts"]["ratings"],
+      "No Genre",
+      1,
+      res["image"],
+      reviews,
+    ));
   }
   return toRet;
 }
@@ -59,7 +71,7 @@ class QueryResultEntry {
   int searchResultNum;
   String title;
   String author;
-  int year;
+  String year;
   double avgRating;
   int numReviews;
   String genre;

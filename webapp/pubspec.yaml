@@ -36,6 +36,7 @@ dependencies:
   expandable: ^4.1.4
   flutter_xlider: ^3.4.0
   http: ^0.12.2
+  meet_network_image: ^0.1.2
 
 dev_dependencies:
   flutter_test:
@@ -57,8 +58,6 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
      - assets/Background.png
-     - assets/ChamberOfSecrets.jpeg
-     - assets/ThursdayMurderClub.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
