@@ -56,8 +56,20 @@ class MyApp extends StatelessWidget {
 class PageContrContr {
   PageContrContr(this.controller);
   PageController controller;
+  String searchString;
+  var txt = TextEditingController();
 
-  void goToPage(int page) {
+  void search(String string) {
+    _goToPage(1);
+    searchString = string;
+    txt.text = string;
+  }
+
+  void back() {
+    _goToPage(0);
+  }
+
+  void _goToPage(int page) {
     controller.animateToPage(page, curve: Curves.easeIn, duration: Duration(milliseconds: 300));
   }
 }

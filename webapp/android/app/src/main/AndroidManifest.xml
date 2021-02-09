@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.webapp">
-   <application
+    <application android:usesCleartextTraffic="true"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <application
         android:label="webapp"
         android:icon="@mipmap/ic_launcher">
         <activity

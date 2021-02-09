@@ -31,13 +31,15 @@ class _SearchSortDropdownState extends State<SearchSortDropdown> {
 }
 
 class Searchbar extends StatelessWidget {
-  Searchbar(this.onSubmitted);
+  Searchbar(this.onSubmitted, this.txt);
   Function(String) onSubmitted;
+  TextEditingController txt;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       onSubmitted: onSubmitted,
+      controller: txt,
       textInputAction: TextInputAction.search,
       textAlignVertical: TextAlignVertical.center,
       style: TextStyle(fontSize: 22.0, color: textColor),
@@ -82,8 +84,8 @@ class HomePage extends StatelessWidget {
         FractionallySizedBox(
             widthFactor: 0.5,
             child: Searchbar((String string) {
-              controller.goToPage(1);
-            })),
+              controller.search(string);
+            }, controller.txt)),
         SizedBox(height: 50),
         Row(
           mainAxisSize: MainAxisSize.min,
@@ -138,7 +140,7 @@ class HomepageButton extends StatelessWidget {
       child: FlatButton(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(cornerRadius), side: BorderSide(width: 0)),
         onPressed: () {
-          controller.goToPage(1);
+          controller.search("Not Implemented");
         },
         color: Colors.white,
         hoverColor: Colors.grey[100],

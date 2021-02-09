@@ -1,15 +1,26 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:expandable/expandable.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 
 import 'HomePage.dart';
 import 'Utils.dart';
 import 'main.dart';
 
-class SearchResults extends StatelessWidget {
+class SearchResults extends StatefulWidget {
   SearchResults(this.controller);
   PageContrContr controller;
 
+  @override
+  _SearchResultsState createState() => _SearchResultsState();
+}
+
+class _SearchResultsState extends State<SearchResults> {
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -50,7 +61,7 @@ class SearchResults extends StatelessWidget {
                           minWidth: 0,
                           shape: CircleBorder(),
                           onPressed: () {
-                            controller.goToPage(0);
+                            widget.controller.back();
                           },
                           color: Colors.white,
                           hoverColor: Colors.grey[100],
@@ -59,7 +70,11 @@ class SearchResults extends StatelessWidget {
                           child: Icon(Icons.arrow_back, color: textColor),
                         ),
                         SizedBox(width: 10),
-                        Expanded(child: Searchbar((String string) {})),
+                        Expanded(
+                            child: Searchbar((String string) {
+                          setState(() {});
+                          widget.controller.search(string);
+                        }, widget.controller.txt)),
                       ],
                     ),
                   ],
@@ -73,7 +88,57 @@ class SearchResults extends StatelessWidget {
                   children: [
                     Expanded(flex: 1, child: SearchFilters()),
                     SizedBox(width: 40),
-                    Expanded(flex: 2, child: SearchResultsList(getQueries()))
+                    Expanded(
+                      flex: 2,
+                      child: FutureBuilder(
+                          key: Key(widget.controller.searchString),
+                          future: http
+                              .get(Uri.http('34.71.136.188:8000', 'search/${widget.controller.searchString}'))
+                              .timeout(Duration(seconds: 15)),
+                          builder: (BuildContext context, AsyncSnapshot<Response> snapshot) {
+                            if (snapshot.hasData) {
+                              return SearchResultsList(getQueries(snapshot.data.body));
+                            } else if (snapshot.hasError) {
+                              String errorText = snapshot.error.toString();
+                              if (snapshot.error is TimeoutException) {
+                                errorText = "Server timed out";
+                              }
+                              return Container(
+                                padding: EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                    color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(10))),
+                                child: Column(
+                                  children: [
+                                    Icon(
+                                      Icons.error_outline,
+                                      color: Colors.red,
+                                      size: 60,
+                                    ),
+                                    Text(
+                                      "Sorry, something broke.",
+                                      style: bookTitleStyle,
+                                    ),
+                                    Text(
+                                      "$errorText",
+                                      style: quoteStyle,
+                                      textAlign: TextAlign.center,
+                                    )
+                                  ],
+                                ),
+                              );
+                            } else {
+                              return Center(
+                                child: SizedBox(
+                                  child: CircularProgressIndicator(
+                                    backgroundColor: Colors.white,
+                                  ),
+                                  width: 60,
+                                  height: 60,
+                                ),
+                              );
+                            }
+                          }),
+                    )
                   ],
                 )),
           )
@@ -302,7 +367,7 @@ class SearchResultsList extends StatelessWidget {
 
 Widget starSideGreyBox(QueryResultEntry e, bool isExpanded) {
   return AnimatedContainer(
-      padding: EdgeInsets.symmetric(vertical: isExpanded ? 30 : 10, horizontal: 10),
+      padding: EdgeInsets.symmetric(vertical: isExpanded ? 10 : 10, horizontal: 10),
       decoration: BoxDecoration(
           boxShadow: [BoxShadow(blurRadius: 1, offset: Offset(0, 5), spreadRadius: -2, color: Color(0x77000000))],
           color: Color(0xffeeeeee),
@@ -325,7 +390,7 @@ Widget starSideGreyBox(QueryResultEntry e, bool isExpanded) {
       ));
 }
 
-Widget bookPanelContainer(bool isLast, int idx, Widget child) {
+Widget bookPanelContainer(TickerProvider vsync, bool isLast, int idx, Widget child) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
@@ -363,6 +428,8 @@ class BookPanel extends StatefulWidget {
   _BookPanelState createState() => _BookPanelState();
 }
 
+int absolute_max_review_length = 60;
+
 class _BookPanelState extends State<BookPanel> with TickerProviderStateMixin {
   bool isExpanded = false;
   AnimationController controller;
@@ -373,147 +440,140 @@ class _BookPanelState extends State<BookPanel> with TickerProviderStateMixin {
     controller.forward();
   }
 
+  Size _textSize(String text, TextStyle style, double width) {
+    final TextPainter textPainter = TextPainter(
+      text: TextSpan(text: text, style: style),
+      textDirection: TextDirection.ltr,
+      maxLines: absolute_max_review_length,
+    )..layout(minWidth: 0, maxWidth: width);
+    return textPainter.size;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return bookPanelContainer(
-        widget.isLast,
-        widget.e.searchResultNum,
-        Container(
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(topRight: Radius.circular(10), bottomRight: Radius.circular(10))),
-            child: AnimatedContainer(
-              duration: Duration(milliseconds: 200),
-              height: isExpanded ? 480 : 180,
-              child: bookPanelContents(
-                  widget.e,
-                  isExpanded,
-                  Container(
-                    decoration:
-                        BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(10)), color: Colors.grey[100]),
-                    margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                    padding: EdgeInsets.all(10),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        AnimatedCrossFade(
-                          firstChild: Text("...knock your socks off, super-scorcher, couldn’t put it down...",
-                              overflow: TextOverflow.ellipsis, maxLines: 1, style: quoteStyle),
-                          secondChild: Text(
-                            text1,
-                            style: quoteStyle,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 6,
-                          ),
-                          crossFadeState: isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-                          duration: Duration(milliseconds: 200),
-                        ),
-                        Center(
-                            child: AnimatedContainer(
-                          padding: EdgeInsets.symmetric(vertical: isExpanded ? 10 : 2),
-                          duration: Duration(milliseconds: 200),
-                          child: AnimatedContainer(
-                              duration: Duration(milliseconds: 200),
-                              width: 200,
-                              height: isExpanded ? 2 : 1,
-                              color: textColor),
-                        )),
-                        AnimatedCrossFade(
-                          firstChild:
-                              Text("...you’ll absolutely laugh your socks off...", style: quoteStyle, maxLines: 1),
-                          secondChild: Text(
-                            text1,
-                            style: quoteStyle,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 6,
-                          ),
-                          crossFadeState: isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-                          duration: Duration(milliseconds: 200),
-                        ),
-                        Center(
-                            child: AnimatedContainer(
-                          padding: EdgeInsets.symmetric(vertical: isExpanded ? 10 : 2),
-                          duration: Duration(milliseconds: 200),
-                          child: AnimatedContainer(
-                              duration: Duration(milliseconds: 200),
-                              width: 200,
-                              height: isExpanded ? 2 : 1,
-                              color: textColor),
-                        )),
-                        AnimatedCrossFade(
-                          firstChild: Text("...blew my socks off. Best thing I’ve read in years...",
-                              style: quoteStyle, maxLines: 1),
-                          secondChild: Text(
-                            text1,
-                            style: quoteStyle,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 6,
-                          ),
-                          crossFadeState: isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-                          duration: Duration(milliseconds: 200),
-                        )
-                      ],
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        isExpanded = !isExpanded;
-                      });
-                    },
-                    child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      Text(isExpanded ? "Collapse" : "Expand", style: expandStyle),
-                      SizedBox(width: 5),
-                      Icon(isExpanded ? Icons.remove_circle_outline_outlined : Icons.add_circle_outline_outlined,
-                          color: primaryColor)
-                    ]),
-                  )),
-            )));
-  }
-}
-
-Widget bookPanelContents(QueryResultEntry e, bool isExpanded, Widget child, Widget expandyWidget) {
-  return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Image(
-      height: 180,
-      image: AssetImage('assets/${e.imageString}'),
-      repeat: ImageRepeat.repeat,
-      fit: BoxFit.fitHeight,
-    ),
-    SizedBox(width: 10),
-    Expanded(
-      flex: 7,
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            e.title,
-            style: bookTitleStyle,
-            maxLines: 1,
+    return LayoutBuilder(builder: (context, constraint) {
+      bool canExpand = true;
+      List<Widget> children = [];
+      int i = 0;
+      for (var r in widget.e.reviews) {
+        int offset = max(r.start - 100, 0);
+        String newText = r.text.substring(offset);
+        int newStart = r.start - offset;
+        int newEnd = r.end - offset;
+        if (offset > 0) {
+          newText = "..." + newText;
+          // For ellipsis
+          newStart += 3;
+          newEnd += 3;
+        }
+        double widthGuess = constraint.minWidth / 2 - 20; // Fragile and horrible, but heyo
+        double textSize = _textSize(newText, quoteStyle, widthGuess).height;
+        if (textSize < 100 && widget.e.reviews.length == 1) {
+          canExpand = false;
+        }
+        children.add(AnimatedContainer(
+          duration: Duration(milliseconds: 200),
+          height: isExpanded ? textSize : 100,
+          child: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(text: newText.substring(0, newStart)),
+                TextSpan(text: r.foundText, style: quoteStyle.copyWith(fontWeight: FontWeight.bold)),
+                TextSpan(text: newText.substring(newEnd))
+              ],
+              style: quoteStyle,
+            ),
+            maxLines: absolute_max_review_length,
             overflow: TextOverflow.ellipsis,
           ),
-          Text(e.author, style: authorStyle),
-          child,
-        ],
-      ),
-    ),
-    SizedBox(width: 10),
-    Expanded(
-      flex: 3,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          starSideGreyBox(e, isExpanded),
-          Expanded(child: Container()),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 15.0, 0, 5.0),
-            child: expandyWidget,
+        ));
+        if (i != children.length - 1) {
+          children.add(Center(
+              child: AnimatedContainer(
+            padding: EdgeInsets.symmetric(vertical: isExpanded ? 10 : 2),
+            duration: Duration(milliseconds: 200),
+            child: AnimatedContainer(
+                duration: Duration(milliseconds: 200), width: 200, height: isExpanded ? 2 : 1, color: textColor),
+          )));
+        }
+        i++;
+      }
+      return bookPanelContainer(
+        this,
+        widget.isLast,
+        widget.e.searchResultNum,
+        AnimatedContainer(
+          duration: Duration(milliseconds: 200),
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(topRight: Radius.circular(10), bottomRight: Radius.circular(10))),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.network(
+                widget.e.imageURL,
+                height: 180,
+                width: 120,
+                repeat: ImageRepeat.repeat,
+                fit: BoxFit.fitHeight,
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                flex: 7,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.e.title,
+                      style: bookTitleStyle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(widget.e.author, style: authorStyle),
+                    Container(
+                      decoration:
+                          BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(10)), color: Colors.grey[100]),
+                      margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                      padding: EdgeInsets.all(10),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: children,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                  flex: 3,
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    starSideGreyBox(widget.e, isExpanded),
+                    Expanded(child: Container()),
+                    if (canExpand)
+                      Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 15.0, 0, 5.0),
+                          child: TextButton(
+                            onPressed: () {
+                              setState(() {
+                                isExpanded = !isExpanded;
+                              });
+                            },
+                            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                              Text(isExpanded ? "Collapse" : "Expand", style: expandStyle),
+                              SizedBox(width: 5),
+                              Icon(
+                                  isExpanded ? Icons.remove_circle_outline_outlined : Icons.add_circle_outline_outlined,
+                                  color: primaryColor)
+                            ]),
+                          )),
+                  ])),
+            ],
           ),
-        ],
-      ),
-    ),
-  ]);
+        ),
+      );
+    });
+  }
 }

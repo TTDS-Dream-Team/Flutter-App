@@ -1,9 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import 'main.dart';
-
-var text1 =
-    "Lorem ipsum blew my socks off. Lorem ipsum dolor sit amet, consectetur adipiscing elit. In non sapien nulla. Curabitur facilisis placerat lacus, vel porttitor mi molestie id. Donec dignissim condimentum leo, at varius nisl malesuada et. Sed ligula ante, rhoncus eu tristique sed, viverra vitae urna. Nullam nec commodo nunc, vitae hendrerit urna. Pellentesque id ullamcorper nibh. Nulla at urna in nunc cursus elementum.";
 
 class Logo extends StatelessWidget {
   Logo({this.fontSize = 120.0});
@@ -33,24 +32,30 @@ Widget starWidget(double rating) {
   );
 }
 
-List<QueryResultEntry> getQueries() {
-  List<QueryResultEntry> basis = [
-    QueryResultEntry(
-        1, "The Thursday Murder Club", "Richard Osman", 2020, 4.68, 24000, "Detective", 1, "ThursdayMurderClub.jpeg"),
-    QueryResultEntry(1, "Harry Potter and the Chamber of Secrets", "J.K. Rowling", 1998, 4.43, 2843096, "Fantasy", 4,
-        "ChamberOfSecrets.jpeg")
-  ];
+List<QueryResultEntry> getQueries(String response) {
+  Map<String, dynamic> responses = jsonDecode(response);
   List<QueryResultEntry> toRet = [];
-  for (int i = 0; i < 10; i++) {
-    toRet.add(basis[0]);
-    toRet.add(basis[1]);
+  for (var r in responses.keys.toList()..sort()) {
+    var res = responses[r];
+    List<ReviewResult> reviews = [];
+    reviews.add(ReviewResult(res["text"], res["relevant_text"], res["relevant_range"][0], res["relevant_range"][1]));
+    toRet.add(QueryResultEntry(
+        int.parse(r) + 1, res["title"], "No Author", 2020, 5.0, 0, "No Genre", 1, res["image"], reviews));
   }
   return toRet;
 }
 
+class ReviewResult {
+  ReviewResult(this.text, this.foundText, this.start, this.end);
+  String foundText;
+  String text;
+  int start;
+  int end;
+}
+
 class QueryResultEntry {
   QueryResultEntry(this.searchResultNum, this.title, this.author, this.year, this.avgRating, this.numReviews,
-      this.genre, this.genreRanking, this.imageString);
+      this.genre, this.genreRanking, this.imageURL, this.reviews);
   int searchResultNum;
   String title;
   String author;
@@ -59,5 +64,6 @@ class QueryResultEntry {
   int numReviews;
   String genre;
   int genreRanking;
-  String imageString;
+  String imageURL;
+  List<ReviewResult> reviews;
 }
