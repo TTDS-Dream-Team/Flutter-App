@@ -3,20 +3,20 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 const RESOURCES = {
-  "assets/AssetManifest.json": "9f320eca834d18180eb99c6b29c9afd6",
+  "assets/AssetManifest.json": "b146031e32fd95c00083f0f7434cd55e",
 "assets/assets/Background.png": "411efe34ab9c149fb8a14a9350dc9af0",
 "assets/assets/ChamberOfSecrets.jpeg": "801101c86ab12f9d622a42707fdd6868",
 "assets/assets/ThursdayMurderClub.jpeg": "f5158b5691e26794ac409bfb7587882e",
 "assets/FontManifest.json": "dc3d03800ccca4601324923c0b1d6d57",
 "assets/fonts/MaterialIcons-Regular.otf": "1288c9e28052e028aba623321f7826ac",
-"assets/NOTICES": "8421bb825be5ec7a1337ceb0a100706e",
+"assets/NOTICES": "b36f804cc8362e4b08587c44887a8abc",
 "assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "6d342eb68f170c97609e9da345464e5e",
 "favicon.png": "5dcef449791fa27946b3d35ad8803796",
 "icons/Icon-192.png": "ac9a721a12bbc803b44f645561ecb1e1",
 "icons/Icon-512.png": "96e752610906ba2a93c65f8abe1645f1",
-"index.html": "365c4cf5e38f22bf00681cc178eaf578",
-"/": "365c4cf5e38f22bf00681cc178eaf578",
-"main.dart.js": "03f992320ce0f463699dc31ca62e7f63",
+"index.html": "111eb52c768df1dc5f0b0e4acabed59a",
+"/": "111eb52c768df1dc5f0b0e4acabed59a",
+"main.dart.js": "a28bca62e55e4202d3515849aab3faa4",
 "manifest.json": "d40331d286e426f364f31717c566a2ae",
 "version.json": "241f4a42b47957020519cd2a4cf2c7a2"
 };
@@ -162,7 +162,7 @@ async function downloadOffline() {
     }
     currentContent[key] = true;
   }
-  for (var resourceKey in Object.keys(RESOURCES)) {
+  for (var resourceKey of Object.keys(RESOURCES)) {
     if (!currentContent[resourceKey]) {
       resources.push(resourceKey);
     }

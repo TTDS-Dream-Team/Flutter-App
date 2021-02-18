@@ -11,7 +11,6 @@
     Fore more details:
     * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
   -->
-  <base href="/">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
@@ -28,6 +27,12 @@
 
   <title>webapp</title>
   <link rel="manifest" href="manifest.json">
+  <style>
+  p {
+    overflow-x: hidden !important;
+	overflow-y: hidden !important;
+  }
+  </style>
 </head>
 <body>
   <!-- This script installs service_worker.js to provide PWA functionality to
@@ -36,7 +41,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('flutter-first-frame', function () {
-        navigator.serviceWorker.register('flutter_service_worker.js?v=3878117721');
+        navigator.serviceWorker.register('flutter_service_worker.js?v=2363944313');
       });
     }
   </script>
