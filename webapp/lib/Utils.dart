@@ -37,20 +37,24 @@ List<QueryResultEntry> getQueries(String response) {
   List<QueryResultEntry> toRet = [];
   for (var r in responses.keys.toList()..sort()) {
     var res = responses[r];
-    String yearPublished = res["year_published"];
+    print(res);
+    String yearPublished = res["publication_year"];
     if (yearPublished.length != 0) yearPublished = yearPublished + ", ";
     List<ReviewResult> reviews = [];
-    reviews.add(ReviewResult(res["text"], res["relevant_text"], res["relevant_range"][0], res["relevant_range"][1]));
+    var text = res["review_text"];
+    var relevantText = res["relevant_text"];
+    reviews.add(
+        ReviewResult(text, relevantText, text.indexOf(relevantText), text.indexOf(relevantText) + relevantText.length));
     toRet.add(QueryResultEntry(
       int.parse(r) + 1,
       res["title"],
-      "No Author",
+      res["authors"][0],
       yearPublished,
-      res["average_rating"],
-      res["counts"]["ratings"],
+      double.parse(res["average_rating"]),
+      int.parse(res["text_reviews_count"]),
       "No Genre",
       1,
-      res["image"],
+      res["image_url"],
       reviews,
     ));
   }
