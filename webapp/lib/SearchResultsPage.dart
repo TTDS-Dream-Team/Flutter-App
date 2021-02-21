@@ -93,7 +93,7 @@ class _SearchResultsState extends State<SearchResults> {
                       child: FutureBuilder(
                           key: Key(widget.controller.searchString),
                           future: http
-                              .get(Uri.http('34.71.136.188:8000', 'search/${widget.controller.searchString}'))
+                              .get(Uri.https('better-reads.xyz:8000', 'search/${widget.controller.searchString}'))
                               .timeout(Duration(seconds: 15)),
                           builder: (BuildContext context, AsyncSnapshot<Response> snapshot) {
                             if (snapshot.hasData) {
@@ -281,7 +281,10 @@ class _SearchFiltersState extends State<SearchFilters> {
               expanded: GenreGrid(),
             ),
             Divider(color: Colors.black54),
-            Center(child: Logo(fontSize: 40.0)),
+            Center(
+                child: Column(
+              children: [Logo(fontSize: 40.0), Text("Version 0.0.5", style: authorStyle)],
+            )),
           ],
         ));
   }
