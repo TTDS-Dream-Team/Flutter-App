@@ -93,7 +93,7 @@ class _SearchResultsState extends State<SearchResults> {
                       child: FutureBuilder(
                           key: Key(widget.controller.searchString),
                           future: http
-                              .get(Uri.https('better-reads.xyz:8000', 'search/${widget.controller.searchString}'))
+                              .get(Uri.https('api.better-reads.xyz:8000', 'search/${widget.controller.searchString}'))
                               .timeout(Duration(seconds: 15)),
                           builder: (BuildContext context, AsyncSnapshot<Response> snapshot) {
                             if (snapshot.hasData) {
