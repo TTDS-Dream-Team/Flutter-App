@@ -57767,7 +57767,7 @@ m=M.b0(r,new T.fE(C.wc,T.cH(H.b([p,o,T.d0(H.b([N.acB(L.ll(C.wA,$.qi(),r),C.i,n,0
 n=T.i4(new X.v_(r),1)
 o=T.cs(r,r,40)
 p=s.a.c.b
-p=T.d0(H.b([n,o,T.i4(new B.nu(G.asB(P.aq8("https","better-reads.xyz:8000","search/"+H.d(p),r)).zC(0,P.bM(0,0,15)),new X.a4Y(),new D.ct(p,t.fr),t.zZ),2)],q),C.bn,C.C,C.u)
+p=T.d0(H.b([n,o,T.i4(new B.nu(G.asB(P.aq8("https","api.better-reads.xyz:8000","search/"+H.d(p),r)).zC(0,P.bM(0,0,15)),new X.a4Y(),new D.ct(p,t.fr),t.zZ),2)],q),C.bn,C.C,C.u)
 return T.dR(T.cH(H.b([m,T.i4(new E.ED(new V.ar(30,20,30,20),!0,p,r),1)],q),C.bC,C.C,C.u,r,r,C.P),r,r)}}
 X.a4W.prototype={
 $0:function(){this.a.a.c.a.GN(0,C.c8,P.bM(0,300,0))},
