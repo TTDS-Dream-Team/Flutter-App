@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:expandable/expandable.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
 import 'package:http/http.dart' as http;
@@ -21,6 +22,7 @@ class SearchResults extends StatefulWidget {
 }
 
 class _SearchResultsState extends State<SearchResults> {
+  final _controller = ScrollController();
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -81,66 +83,85 @@ class _SearchResultsState extends State<SearchResults> {
                 ),
               )),
           Expanded(
-            child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(flex: 1, child: SearchFilters()),
-                    SizedBox(width: 40),
-                    Expanded(
-                      flex: 2,
-                      child: FutureBuilder(
-                          key: Key(widget.controller.searchString),
-                          future: http
-                              .get(Uri.https('api.better-reads.xyz:8000', 'search/${widget.controller.searchString}'))
-                              .timeout(Duration(seconds: 15)),
-                          builder: (BuildContext context, AsyncSnapshot<Response> snapshot) {
-                            if (snapshot.hasData) {
-                              return SearchResultsList(getQueries(snapshot.data.body));
-                            } else if (snapshot.hasError) {
-                              String errorText = snapshot.error.toString();
-                              if (snapshot.error is TimeoutException) {
-                                errorText = "Server timed out";
-                              }
-                              return Container(
-                                padding: EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                    color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(10))),
-                                child: Column(
-                                  children: [
-                                    Icon(
-                                      Icons.error_outline,
-                                      color: Colors.red,
-                                      size: 60,
-                                    ),
-                                    Text(
-                                      "Sorry, something broke.",
-                                      style: bookTitleStyle,
-                                    ),
-                                    Text(
-                                      "$errorText",
-                                      style: quoteStyle,
-                                      textAlign: TextAlign.center,
-                                    )
-                                  ],
-                                ),
-                              );
-                            } else {
-                              return Center(
-                                child: SizedBox(
-                                  child: CircularProgressIndicator(
-                                    backgroundColor: Colors.white,
+            child: Listener(
+              onPointerSignal: (ps) {
+                if (ps is PointerScrollEvent) {
+                  int speed = 130;
+                  if (ps.scrollDelta.dy < 0) {
+                    speed *= -1;
+                  }
+
+                  final newOffset = _controller.offset + speed;
+                  if (ps.scrollDelta.dy.isNegative) {
+                    _controller.jumpTo(max(0, newOffset));
+                  } else {
+                    _controller.jumpTo(min(_controller.position.maxScrollExtent, newOffset));
+                  }
+                }
+              },
+              child: SingleChildScrollView(
+                  controller: _controller,
+                  physics: NeverScrollableScrollPhysics(),
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(flex: 1, child: SearchFilters()),
+                      SizedBox(width: 40),
+                      Expanded(
+                        flex: 2,
+                        child: FutureBuilder(
+                            key: Key(widget.controller.searchString),
+                            future: http
+                                .get(Uri.https('api.better-reads.xyz:8000', 'search/${widget.controller.searchString}'))
+                                .timeout(Duration(seconds: 15)),
+                            builder: (BuildContext context, AsyncSnapshot<Response> snapshot) {
+                              if (snapshot.hasData) {
+                                return SearchResultsList(getQueries(snapshot.data.body));
+                              } else if (snapshot.hasError) {
+                                String errorText = snapshot.error.toString();
+                                if (snapshot.error is TimeoutException) {
+                                  errorText = "Server timed out";
+                                }
+                                return Container(
+                                  padding: EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
+                                      color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(10))),
+                                  child: Column(
+                                    children: [
+                                      Icon(
+                                        Icons.error_outline,
+                                        color: Colors.red,
+                                        size: 60,
+                                      ),
+                                      Text(
+                                        "Sorry, something broke.",
+                                        style: bookTitleStyle,
+                                      ),
+                                      Text(
+                                        "$errorText",
+                                        style: quoteStyle,
+                                        textAlign: TextAlign.center,
+                                      )
+                                    ],
                                   ),
-                                  width: 60,
-                                  height: 60,
-                                ),
-                              );
-                            }
-                          }),
-                    )
-                  ],
-                )),
+                                );
+                              } else {
+                                return Center(
+                                  child: SizedBox(
+                                    child: CircularProgressIndicator(
+                                      backgroundColor: Colors.white,
+                                    ),
+                                    width: 60,
+                                    height: 60,
+                                  ),
+                                );
+                              }
+                            }),
+                      )
+                    ],
+                  )),
+            ),
           )
         ],
       ),
@@ -283,7 +304,7 @@ class _SearchFiltersState extends State<SearchFilters> {
             Divider(color: Colors.black54),
             Center(
                 child: Column(
-              children: [Logo(fontSize: 40.0), Text("Version 0.0.5", style: authorStyle)],
+              children: [Logo(fontSize: 40.0), Text("Version 0.0.6", style: authorStyle)],
             )),
           ],
         ));
@@ -472,15 +493,19 @@ class _BookPanelState extends State<BookPanel> with TickerProviderStateMixin {
         // newText = newText.substring(0, newStart) + "<bold>" + r.foundText + "</bold>" + newText.substring(newEnd);
         children.add(ConstrainedBox(
           constraints: BoxConstraints(minHeight: 100),
-          child: Text.rich(
-            TextSpan(children: [
-              TextSpan(text: newText.substring(0, newStart)),
-              TextSpan(text: r.foundText, style: quoteStyle.copyWith(fontWeight: FontWeight.bold)),
-              TextSpan(text: newText.substring(newEnd))
-            ]),
-            style: quoteStyle,
-            overflow: TextOverflow.ellipsis,
-            maxLines: isExpanded ? absolute_max_review_length : 5,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 2.0),
+            child: SelectableText.rich(
+              TextSpan(children: [
+                TextSpan(text: newText.substring(0, newStart)),
+                TextSpan(text: r.foundText, style: quoteStyle.copyWith(fontWeight: FontWeight.bold)),
+                TextSpan(text: newText.substring(newEnd))
+              ]),
+              scrollPhysics: NeverScrollableScrollPhysics(),
+              style: quoteStyle,
+              minLines: 5,
+              maxLines: isExpanded ? absolute_max_review_length : 5,
+            ),
           ),
         ));
         if (i != children.length - 1) {

@@ -37,7 +37,6 @@ List<QueryResultEntry> getQueries(String response) {
   List<QueryResultEntry> toRet = [];
   for (var r in responses.keys.toList()..sort()) {
     var res = responses[r];
-    print(res);
     String yearPublished = res["publication_year"];
     if (yearPublished.length != 0) yearPublished = yearPublished + ", ";
     List<ReviewResult> reviews = [];
