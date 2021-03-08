@@ -32,7 +32,7 @@ class _SearchResultsState extends State<SearchResults> {
           Container(
               color: Color(0xff1b4a81),
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
+                padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -84,84 +84,91 @@ class _SearchResultsState extends State<SearchResults> {
               )),
           Expanded(
             child: Listener(
-              onPointerSignal: (ps) {
-                if (ps is PointerScrollEvent) {
-                  int speed = 130;
-                  if (ps.scrollDelta.dy < 0) {
-                    speed *= -1;
-                  }
+                onPointerSignal: (ps) {
+                  if (ps is PointerScrollEvent) {
+                    int speed = 130;
+                    if (ps.scrollDelta.dy < 0) {
+                      speed *= -1;
+                    }
 
-                  final newOffset = _controller.offset + speed;
-                  if (ps.scrollDelta.dy.isNegative) {
-                    _controller.jumpTo(max(0, newOffset));
-                  } else {
-                    _controller.jumpTo(min(_controller.position.maxScrollExtent, newOffset));
+                    final newOffset = _controller.offset + speed;
+                    if (ps.scrollDelta.dy.isNegative) {
+                      _controller.jumpTo(max(0, newOffset));
+                    } else {
+                      _controller.jumpTo(min(_controller.position.maxScrollExtent, newOffset));
+                    }
                   }
-                }
-              },
-              child: SingleChildScrollView(
-                  controller: _controller,
-                  physics: NeverScrollableScrollPhysics(),
-                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(flex: 1, child: SearchFilters()),
-                      SizedBox(width: 40),
-                      Expanded(
-                        flex: 2,
-                        child: FutureBuilder(
-                            key: Key(widget.controller.searchString),
-                            future: http
-                                .get(Uri.https('api.better-reads.xyz:8000', 'search/${widget.controller.searchString}'))
-                                .timeout(Duration(seconds: 15)),
-                            builder: (BuildContext context, AsyncSnapshot<Response> snapshot) {
-                              if (snapshot.hasData) {
-                                return SearchResultsList(getQueries(snapshot.data.body));
-                              } else if (snapshot.hasError) {
-                                String errorText = snapshot.error.toString();
-                                if (snapshot.error is TimeoutException) {
-                                  errorText = "Server timed out";
-                                }
-                                return Container(
-                                  padding: EdgeInsets.all(20),
-                                  decoration: BoxDecoration(
-                                      color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(10))),
-                                  child: Column(
-                                    children: [
-                                      Icon(
-                                        Icons.error_outline,
-                                        color: Colors.red,
-                                        size: 60,
-                                      ),
-                                      Text(
-                                        "Sorry, something broke.",
-                                        style: bookTitleStyle,
-                                      ),
-                                      Text(
-                                        "$errorText",
-                                        style: quoteStyle,
-                                        textAlign: TextAlign.center,
-                                      )
-                                    ],
-                                  ),
-                                );
-                              } else {
-                                return Center(
-                                  child: SizedBox(
-                                    child: CircularProgressIndicator(
-                                      backgroundColor: Colors.white,
-                                    ),
-                                    width: 60,
-                                    height: 60,
-                                  ),
-                                );
+                },
+                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Expanded(
+                      flex: 1,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            SearchFilters(),
+                          ],
+                        ),
+                      )),
+                  SizedBox(width: 40),
+                  Expanded(
+                    flex: 2,
+                    child: SingleChildScrollView(
+                      controller: _controller,
+                      physics: NeverScrollableScrollPhysics(),
+                      padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+                      child: FutureBuilder(
+                          key: Key(widget.controller.searchString),
+                          future: http
+                              .get(Uri.https('api.better-reads.xyz:8000', 'search/${widget.controller.searchString}'))
+                              .timeout(Duration(seconds: 15)),
+                          builder: (BuildContext context, AsyncSnapshot<Response> snapshot) {
+                            if (snapshot.hasData) {
+                              return SearchResultsList(getQueries(snapshot.data.body));
+                            } else if (snapshot.hasError) {
+                              String errorText = snapshot.error.toString();
+                              if (snapshot.error is TimeoutException) {
+                                errorText = "Server timed out";
                               }
-                            }),
-                      )
-                    ],
-                  )),
-            ),
+                              return Container(
+                                padding: EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                    color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(10))),
+                                child: Column(
+                                  children: [
+                                    Icon(
+                                      Icons.error_outline,
+                                      color: Colors.red,
+                                      size: 60,
+                                    ),
+                                    Text(
+                                      "Sorry, something broke.",
+                                      style: bookTitleStyle,
+                                    ),
+                                    Text(
+                                      "$errorText",
+                                      style: quoteStyle,
+                                      textAlign: TextAlign.center,
+                                    )
+                                  ],
+                                ),
+                              );
+                            } else {
+                              return Center(
+                                child: SizedBox(
+                                  child: CircularProgressIndicator(
+                                    backgroundColor: Colors.white,
+                                  ),
+                                  width: 60,
+                                  height: 60,
+                                ),
+                              );
+                            }
+                          }),
+                    ),
+                  )
+                ])),
           )
         ],
       ),
@@ -304,7 +311,7 @@ class _SearchFiltersState extends State<SearchFilters> {
             Divider(color: Colors.black54),
             Center(
                 child: Column(
-              children: [Logo(fontSize: 40.0), Text("Version 0.0.6", style: authorStyle)],
+              children: [Logo(fontSize: 40.0), Text("Version 0.0.7", style: authorStyle)],
             )),
           ],
         ));

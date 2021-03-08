@@ -36,26 +36,32 @@ List<QueryResultEntry> getQueries(String response) {
   Map<String, dynamic> responses = jsonDecode(response);
   List<QueryResultEntry> toRet = [];
   for (var r in responses.keys.toList()..sort()) {
-    var res = responses[r];
-    String yearPublished = res["publication_year"];
-    if (yearPublished.length != 0) yearPublished = yearPublished + ", ";
-    List<ReviewResult> reviews = [];
-    var text = res["review_text"];
-    var relevantText = res["relevant_text"];
-    reviews.add(
-        ReviewResult(text, relevantText, text.indexOf(relevantText), text.indexOf(relevantText) + relevantText.length));
-    toRet.add(QueryResultEntry(
-      int.parse(r) + 1,
-      res["title"],
-      res["authors"][0],
-      yearPublished,
-      double.parse(res["average_rating"]),
-      int.parse(res["text_reviews_count"]),
-      "No Genre",
-      1,
-      res["image_url"],
-      reviews,
-    ));
+    if (r == "sentiment") continue; // Simple fix
+    try {
+      var res = responses[r];
+      String yearPublished = res["publication_year"];
+      if (yearPublished.length != 0) yearPublished = yearPublished + ", ";
+      List<ReviewResult> reviews = [];
+      String text = res["review_text"];
+      String relevantText = res["relevant_text"];
+      reviews.add(ReviewResult(
+          text, relevantText, text.indexOf(relevantText), text.indexOf(relevantText) + relevantText.length));
+      toRet.add(QueryResultEntry(
+        int.parse(r) + 1,
+        res["title"],
+        (res["authors"] ?? ["No author"])[0],
+        yearPublished,
+        double.parse(res["average_rating"]),
+        int.parse(res["text_reviews_count"]),
+        "No Genre",
+        1,
+        res["image_url"],
+        reviews,
+      ));
+    } catch (e) {
+      print("Error occurred on response " + r + ": " + responses[r].toString());
+      print(e);
+    }
   }
   return toRet;
 }
