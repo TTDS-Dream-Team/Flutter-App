@@ -22,6 +22,7 @@ class SearchResults extends StatefulWidget {
 }
 
 class _SearchResultsState extends State<SearchResults> {
+  var value = "sentimentOnly";
   final _controller = ScrollController();
   @override
   Widget build(BuildContext context) {
@@ -30,7 +31,7 @@ class _SearchResultsState extends State<SearchResults> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
-              color: Color(0xff1b4a81),
+              color: Color(0xff2561a7),
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40.0),
                 child: Column(
@@ -40,16 +41,58 @@ class _SearchResultsState extends State<SearchResults> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                            padding: EdgeInsets.all(10),
-                            decoration:
-                                BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(20))),
-                            child: Logo(fontSize: 60.0)),
+                        Logo(fontSize: 60.0),
                         Row(
                           children: [
+                            Row(
+                              children: [
+                                Text(
+                                  "Full",
+                                  style: authorStyle.copyWith(color: offWhite),
+                                ),
+                                Radio(
+                                  activeColor: offWhite,
+                                  value: "full",
+                                  onChanged: (newV) {
+                                    value = "full";
+                                    setState(() {});
+                                  },
+                                  groupValue: value,
+                                ),
+                                Container(width: 15),
+                                Text(
+                                  "Sentiment Only",
+                                  style: authorStyle.copyWith(color: offWhite),
+                                ),
+                                Radio(
+                                  activeColor: offWhite,
+                                  value: "sentimentOnly",
+                                  onChanged: (newV) {
+                                    value = "sentimentOnly";
+                                    setState(() {});
+                                  },
+                                  groupValue: value,
+                                ),
+                                Container(width: 15),
+                                Text(
+                                  "Simple",
+                                  style: authorStyle.copyWith(color: offWhite),
+                                ),
+                                Radio(
+                                  activeColor: offWhite,
+                                  value: "simple",
+                                  onChanged: (newV) {
+                                    value = "simple";
+                                    setState(() {});
+                                  },
+                                  groupValue: value,
+                                )
+                              ],
+                            ),
+                            Container(width: 40),
                             Text(
                               "Sort by: ",
-                              style: TextStyle(fontSize: 22.0, color: Colors.white),
+                              style: TextStyle(fontSize: 22.0, color: offWhite),
                             ),
                             SizedBox(width: 200, height: 40, child: SearchSortDropdown()),
                           ],
@@ -65,7 +108,7 @@ class _SearchResultsState extends State<SearchResults> {
                           onPressed: () {
                             widget.controller.back();
                           },
-                          color: Colors.white,
+                          color: offWhite,
                           hoverColor: Colors.grey[100],
                           splashColor: Colors.grey[200],
                           padding: EdgeInsets.all(12.0),
@@ -133,8 +176,8 @@ class _SearchResultsState extends State<SearchResults> {
                               }
                               return Container(
                                 padding: EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                    color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(10))),
+                                decoration:
+                                    BoxDecoration(color: offWhite, borderRadius: BorderRadius.all(Radius.circular(10))),
                                 child: Column(
                                   children: [
                                     Icon(
@@ -158,7 +201,7 @@ class _SearchResultsState extends State<SearchResults> {
                               return Center(
                                 child: SizedBox(
                                   child: CircularProgressIndicator(
-                                    backgroundColor: Colors.white,
+                                    backgroundColor: offWhite,
                                   ),
                                   width: 60,
                                   height: 60,
@@ -198,12 +241,12 @@ class _SearchFiltersState extends State<SearchFilters> {
           offset: Offset(0, 1),
         )
       ],
-      color: Colors.white,
+      color: offWhite,
       shape: BoxShape.circle,
     );
     return Container(
         padding: EdgeInsets.all(20),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(10))),
+        decoration: BoxDecoration(color: offWhite, borderRadius: BorderRadius.all(Radius.circular(10))),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -311,7 +354,13 @@ class _SearchFiltersState extends State<SearchFilters> {
             Divider(color: Colors.black54),
             Center(
                 child: Column(
-              children: [Logo(fontSize: 40.0), Text("Version 0.0.7", style: authorStyle)],
+              children: [
+                Logo(
+                  fontSize: 40.0,
+                  color: primaryColor,
+                ),
+                Text("Version 0.0.8", style: authorStyle)
+              ],
             )),
           ],
         ));
@@ -357,7 +406,7 @@ class _GenreGridState extends State<GenreGrid> {
         var key = allValues.keys.toList()[i + numRows * j];
         rows.add(Row(children: [
           Checkbox(
-              checkColor: Colors.white,
+              checkColor: offWhite,
               activeColor: primaryColor,
               value: allValues[key],
               onChanged: (newV) {
@@ -400,7 +449,7 @@ Widget starSideGreyBox(QueryResultEntry e, bool isExpanded) {
   return AnimatedContainer(
       padding: EdgeInsets.symmetric(vertical: isExpanded ? 10 : 10, horizontal: 10),
       decoration: BoxDecoration(
-          boxShadow: [BoxShadow(blurRadius: 1, offset: Offset(0, 5), spreadRadius: -2, color: Color(0x77000000))],
+          // boxShadow: [BoxShadow(blurRadius: 1, offset: Offset(0, 5), spreadRadius: -2, color: Color(0x77000000))],
           color: Color(0xffeeeeee),
           borderRadius: BorderRadius.all(Radius.circular(10))),
       duration: Duration(milliseconds: 200),
@@ -434,7 +483,7 @@ Widget bookPanelContainer(TickerProvider vsync, bool isLast, int idx, Widget chi
               child: Container(
                   padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: offWhite,
                       borderRadius: BorderRadius.only(topLeft: Radius.circular(10), bottomLeft: Radius.circular(10))),
                   child: Text(
                     "$idx",
@@ -508,6 +557,11 @@ class _BookPanelState extends State<BookPanel> with TickerProviderStateMixin {
                 TextSpan(text: r.foundText, style: quoteStyle.copyWith(fontWeight: FontWeight.bold)),
                 TextSpan(text: newText.substring(newEnd))
               ]),
+              onTap: () {
+                setState(() {
+                  isExpanded = !isExpanded;
+                });
+              },
               scrollPhysics: NeverScrollableScrollPhysics(),
               style: quoteStyle,
               minLines: 5,
@@ -534,7 +588,7 @@ class _BookPanelState extends State<BookPanel> with TickerProviderStateMixin {
           duration: Duration(milliseconds: 200),
           padding: EdgeInsets.all(10),
           decoration: BoxDecoration(
-              color: Colors.white,
+              color: offWhite,
               borderRadius: BorderRadius.only(topRight: Radius.circular(10), bottomRight: Radius.circular(10))),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -553,11 +607,14 @@ class _BookPanelState extends State<BookPanel> with TickerProviderStateMixin {
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      widget.e.title,
-                      style: bookTitleStyle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    FittedBox(
+                      fit: BoxFit.fitWidth,
+                      child: Text(
+                        widget.e.title,
+                        style: bookTitleStyle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                     Text("${widget.e.year}${widget.e.author}", style: authorStyle),
                     Container(

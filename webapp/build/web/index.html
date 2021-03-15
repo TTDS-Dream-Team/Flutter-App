@@ -31,6 +31,10 @@
   p {
     overflow-x: hidden !important;
 	overflow-y: hidden !important;
+	image-rendering: pixelated;
+  }
+  flt-glass-pane {
+    image-rendering: pixelated;
   }
   </style>
 </head>
@@ -41,7 +45,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('flutter-first-frame', function () {
-        navigator.serviceWorker.register('flutter_service_worker.js?v=530973746');
+        navigator.serviceWorker.register('flutter_service_worker.js?v=2309351992');
       });
     }
   </script>

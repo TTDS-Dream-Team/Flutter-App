@@ -47,16 +47,16 @@ class Searchbar extends StatelessWidget {
         hintText: 'Search by review...',
         hintStyle: TextStyle(fontSize: 22.0, color: textColor),
         prefixIcon: Icon(Icons.search, color: textFadedColor),
-        fillColor: Colors.white,
+        fillColor: offWhite,
         border: InputBorder.none,
         alignLabelWithHint: true,
         contentPadding: EdgeInsets.only(left: 10.0),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
+          borderSide: BorderSide(color: offWhite),
           borderRadius: BorderRadius.circular(cornerRadius),
         ),
         enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
+          borderSide: BorderSide(color: offWhite),
           borderRadius: BorderRadius.circular(cornerRadius),
         ),
         filled: true,
@@ -77,7 +77,9 @@ class HomePage extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Logo(),
+            Logo(
+              color: primaryColor,
+            ),
           ],
         ),
         SizedBox(height: 50),
@@ -142,7 +144,7 @@ class HomepageButton extends StatelessWidget {
         onPressed: () {
           controller.search("Not Implemented");
         },
-        color: Colors.white,
+        color: offWhite,
         hoverColor: Colors.grey[100],
         splashColor: Colors.grey[200],
         padding: EdgeInsets.all(16.0),

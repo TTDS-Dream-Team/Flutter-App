@@ -18,6 +18,7 @@ Color primaryColor = Color(0xff458ce0);
 Color backgroundColor = Color(0xff2f2f3d);
 Color textColor = Color(0xFF64748B);
 Color textFadedColor = Color(0xFF7484bB);
+Color offWhite = Color(0xFFfbfbfb);
 double cornerRadius = 25;
 
 final numberStyle = TextStyle(fontSize: 14.0, fontStyle: FontStyle.italic, color: textColor)

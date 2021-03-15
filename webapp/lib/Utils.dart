@@ -5,13 +5,14 @@ import 'package:flutter/material.dart';
 import 'main.dart';
 
 class Logo extends StatelessWidget {
-  Logo({this.fontSize = 120.0});
+  Logo({this.fontSize = 120.0, this.color});
   double fontSize;
+  Color color;
   @override
   Widget build(BuildContext context) {
     return Text(
       'BetterReads',
-      style: Theme.of(context).textTheme.headline1.copyWith(fontSize: fontSize),
+      style: Theme.of(context).textTheme.headline1.copyWith(fontSize: fontSize, color: color ?? offWhite),
     );
   }
 }

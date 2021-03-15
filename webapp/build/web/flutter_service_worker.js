@@ -4,7 +4,7 @@ const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 const RESOURCES = {
   "assets/AssetManifest.json": "b146031e32fd95c00083f0f7434cd55e",
-"assets/assets/Background.png": "411efe34ab9c149fb8a14a9350dc9af0",
+"assets/assets/Background.png": "5822ef4b127568524fe8179e91af5fd2",
 "assets/assets/ChamberOfSecrets.jpeg": "801101c86ab12f9d622a42707fdd6868",
 "assets/assets/ThursdayMurderClub.jpeg": "f5158b5691e26794ac409bfb7587882e",
 "assets/FontManifest.json": "dc3d03800ccca4601324923c0b1d6d57",
@@ -14,9 +14,9 @@ const RESOURCES = {
 "favicon.png": "5dcef449791fa27946b3d35ad8803796",
 "icons/Icon-192.png": "ac9a721a12bbc803b44f645561ecb1e1",
 "icons/Icon-512.png": "96e752610906ba2a93c65f8abe1645f1",
-"index.html": "87bf07d76ca7db6b2ce597370457521a",
-"/": "87bf07d76ca7db6b2ce597370457521a",
-"main.dart.js": "f991909a67e08c76c0d462bb46265262",
+"index.html": "bcf528ef8a245c533583474c0eb5a28f",
+"/": "bcf528ef8a245c533583474c0eb5a28f",
+"main.dart.js": "f70ffad83f466f37bfaea7dd0d774344",
 "manifest.json": "d40331d286e426f364f31717c566a2ae",
 "version.json": "241f4a42b47957020519cd2a4cf2c7a2"
 };
