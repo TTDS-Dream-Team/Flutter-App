@@ -33,11 +33,15 @@ Widget starWidget(double rating) {
   );
 }
 
-List<QueryResultEntry> getQueries(String response) {
+List<QueryResultEntry> getQueries(String response, PageContrContr controller) {
   Map<String, dynamic> responses = jsonDecode(response);
   List<QueryResultEntry> toRet = [];
   for (var r in responses.keys.toList()..sort()) {
-    if (r == "sentiment") continue; // Simple fix
+    if (r == "sentiment") {
+      controller.sentiment = responses[r][0];
+      controller.confidence = responses[r][1];
+      continue;
+    }
     try {
       var res = responses[r];
       String yearPublished = res["publication_year"];
@@ -52,7 +56,7 @@ List<QueryResultEntry> getQueries(String response) {
         res["title"],
         (res["authors"] ?? ["No author"])[0],
         yearPublished,
-        double.parse(res["average_rating"]),
+        res["average_rating"],
         int.parse(res["text_reviews_count"]),
         "No Genre",
         1,

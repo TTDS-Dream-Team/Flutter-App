@@ -15,6 +15,7 @@ void main() {
 }
 
 Color primaryColor = Color(0xff458ce0);
+Color primaryColorLight = Color(0xff6ab1ec);
 Color backgroundColor = Color(0xff2f2f3d);
 Color textColor = Color(0xFF64748B);
 Color textFadedColor = Color(0xFF7484bB);
@@ -58,12 +59,30 @@ class PageContrContr {
   PageContrContr(this.controller);
   PageController controller;
   String searchString;
+  var ratingMin = 0.0;
+  var ratingMax = 10.0;
+  var yearMin = 1950.0;
+  var yearMax = 2021.0;
+  var semWeight = 4.0;
+  var exactWeight = 10.0;
+  var senWeight = 2.0;
+  var sentiment = -1.0;
+  var confidence = -1.0;
+  var sort = 0;
   var txt = TextEditingController();
+
+  Function() resetSwitch;
 
   void search(String string) {
     _goToPage(1);
     searchString = string;
     txt.text = string;
+    if (resetSwitch != null) resetSwitch();
+  }
+
+  void reSearch() {
+    _goToPage(1);
+    if (resetSwitch != null) resetSwitch();
   }
 
   void back() {

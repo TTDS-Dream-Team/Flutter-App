@@ -22,10 +22,39 @@ class SearchResults extends StatefulWidget {
 }
 
 class _SearchResultsState extends State<SearchResults> {
-  var value = "sentimentOnly";
   final _controller = ScrollController();
   @override
   Widget build(BuildContext context) {
+    widget.controller.resetSwitch = () {
+      this.setState(() {});
+    };
+    var sort = "relevance";
+    switch (widget.controller.sort) {
+      case 1:
+        sort = "popularity";
+        break;
+      case 2:
+        sort = "rating_asc";
+        break;
+      case 3:
+        sort = "rating_desc";
+        break;
+      default:
+        break;
+    }
+    var searchString = 'search/${widget.controller.searchString}?'
+        'measure_time=false'
+        '&semantic_weight=${widget.controller.semWeight / 10}'
+        '&exact_weight=${widget.controller.exactWeight / 10}'
+        '&sentiment_weight=${widget.controller.senWeight / 10}'
+        '&weight_combination=sum'
+        '&rating_min=${widget.controller.ratingMin / 2}'
+        '&rating_max=${widget.controller.ratingMax / 2}'
+        '&year_min=${widget.controller.yearMin}'
+        '&year_max=${widget.controller.yearMax}'
+        '&result_number=10'
+        '&sort=$sort';
+
     return Center(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -44,57 +73,12 @@ class _SearchResultsState extends State<SearchResults> {
                         Logo(fontSize: 60.0),
                         Row(
                           children: [
-                            Row(
-                              children: [
-                                Text(
-                                  "Full",
-                                  style: authorStyle.copyWith(color: offWhite),
-                                ),
-                                Radio(
-                                  activeColor: offWhite,
-                                  value: "full",
-                                  onChanged: (newV) {
-                                    value = "full";
-                                    setState(() {});
-                                  },
-                                  groupValue: value,
-                                ),
-                                Container(width: 15),
-                                Text(
-                                  "Sentiment Only",
-                                  style: authorStyle.copyWith(color: offWhite),
-                                ),
-                                Radio(
-                                  activeColor: offWhite,
-                                  value: "sentimentOnly",
-                                  onChanged: (newV) {
-                                    value = "sentimentOnly";
-                                    setState(() {});
-                                  },
-                                  groupValue: value,
-                                ),
-                                Container(width: 15),
-                                Text(
-                                  "Simple",
-                                  style: authorStyle.copyWith(color: offWhite),
-                                ),
-                                Radio(
-                                  activeColor: offWhite,
-                                  value: "simple",
-                                  onChanged: (newV) {
-                                    value = "simple";
-                                    setState(() {});
-                                  },
-                                  groupValue: value,
-                                )
-                              ],
-                            ),
                             Container(width: 40),
                             Text(
                               "Sort by: ",
                               style: TextStyle(fontSize: 22.0, color: offWhite),
                             ),
-                            SizedBox(width: 200, height: 40, child: SearchSortDropdown()),
+                            SizedBox(width: 200, height: 40, child: SearchSortDropdown(widget.controller)),
                           ],
                         )
                       ],
@@ -117,7 +101,6 @@ class _SearchResultsState extends State<SearchResults> {
                         SizedBox(width: 10),
                         Expanded(
                             child: Searchbar((String string) {
-                          setState(() {});
                           widget.controller.search(string);
                         }, widget.controller.txt)),
                       ],
@@ -150,7 +133,7 @@ class _SearchResultsState extends State<SearchResults> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            SearchFilters(),
+                            SearchFilters(widget.controller),
                           ],
                         ),
                       )),
@@ -162,13 +145,14 @@ class _SearchResultsState extends State<SearchResults> {
                       physics: NeverScrollableScrollPhysics(),
                       padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
                       child: FutureBuilder(
-                          key: Key(widget.controller.searchString),
+                          key: Key(searchString),
                           future: http
-                              .get(Uri.https('api.better-reads.xyz:8000', 'search/${widget.controller.searchString}'))
+                              .get('https://api.better-reads.xyz:8000/$searchString')
                               .timeout(Duration(seconds: 15)),
                           builder: (BuildContext context, AsyncSnapshot<Response> snapshot) {
                             if (snapshot.hasData) {
-                              return SearchResultsList(getQueries(snapshot.data.body));
+                              return SearchResultsList(
+                                  getQueries(snapshot.data.body, widget.controller), widget.controller);
                             } else if (snapshot.hasError) {
                               String errorText = snapshot.error.toString();
                               if (snapshot.error is TimeoutException) {
@@ -220,30 +204,29 @@ class _SearchResultsState extends State<SearchResults> {
 }
 
 class SearchFilters extends StatefulWidget {
+  SearchFilters(this.controller);
+  PageContrContr controller;
+
   @override
   _SearchFiltersState createState() => _SearchFiltersState();
 }
 
-class _SearchFiltersState extends State<SearchFilters> {
-  double _lowerStars = 0;
-  double _upperStars = 10;
-  double _lowerYear = 1950;
-  double _upperYear = 2021;
+var handleDecor = BoxDecoration(
+  boxShadow: [
+    BoxShadow(
+      color: Colors.black54,
+      blurRadius: 3,
+      spreadRadius: 0.2,
+      offset: Offset(0, 1),
+    )
+  ],
+  color: offWhite,
+  shape: BoxShape.circle,
+);
 
+class _SearchFiltersState extends State<SearchFilters> {
   @override
   Widget build(BuildContext context) {
-    var handleDecor = BoxDecoration(
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black54,
-          blurRadius: 3,
-          spreadRadius: 0.2,
-          offset: Offset(0, 1),
-        )
-      ],
-      color: offWhite,
-      shape: BoxShape.circle,
-    );
     return Container(
         padding: EdgeInsets.all(20),
         decoration: BoxDecoration(color: offWhite, borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -258,7 +241,8 @@ class _SearchFiltersState extends State<SearchFilters> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text("Rating", style: bookTitleStyle),
-                      Text("${_lowerStars / 2} - ${_upperStars / 2}", style: authorStyle)
+                      Text("${widget.controller.ratingMin / 2} - ${widget.controller.ratingMax / 2}",
+                          style: authorStyle)
                     ],
                   ),
                 ],
@@ -266,16 +250,16 @@ class _SearchFiltersState extends State<SearchFilters> {
               collapsed: Container(),
               expanded: FlutterSlider(
                 tooltip: FlutterSliderTooltip(disabled: true),
-                values: [_lowerStars, _upperStars],
+                values: [widget.controller.ratingMin, widget.controller.ratingMax],
                 rangeSlider: true,
                 max: 10.0,
                 min: 0.0,
                 handler: FlutterSliderHandler(
-                  child: Text("${_lowerStars / 2}", style: bookTitleStyle.copyWith(fontSize: 18)),
+                  child: Text("${widget.controller.ratingMin / 2}", style: bookTitleStyle.copyWith(fontSize: 18)),
                   decoration: handleDecor,
                 ),
                 rightHandler: FlutterSliderHandler(
-                  child: Text("${_upperStars / 2}", style: bookTitleStyle.copyWith(fontSize: 18)),
+                  child: Text("${widget.controller.ratingMax / 2}", style: bookTitleStyle.copyWith(fontSize: 18)),
                   decoration: handleDecor,
                 ),
                 hatchMark: FlutterSliderHatchMark(
@@ -284,8 +268,8 @@ class _SearchFiltersState extends State<SearchFilters> {
                   smallLine: FlutterSliderSizedBox(width: 1, height: 1),
                 ),
                 onDragging: (handlerIndex, lowerValue, upperValue) {
-                  _lowerStars = lowerValue;
-                  _upperStars = upperValue;
+                  widget.controller.ratingMin = lowerValue;
+                  widget.controller.ratingMax = upperValue;
                   setState(() {});
                 },
               ),
@@ -299,7 +283,8 @@ class _SearchFiltersState extends State<SearchFilters> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text("Year of Release", style: bookTitleStyle),
-                      Text("${_lowerYear.toInt()} - ${_upperYear.toInt()}", style: authorStyle)
+                      Text("${widget.controller.yearMin.toInt()} - ${widget.controller.yearMax.toInt()}",
+                          style: authorStyle)
                     ],
                   ),
                 ],
@@ -309,16 +294,18 @@ class _SearchFiltersState extends State<SearchFilters> {
                 children: [
                   FlutterSlider(
                     tooltip: FlutterSliderTooltip(disabled: true),
-                    values: [_lowerYear, _upperYear],
+                    values: [widget.controller.yearMin, widget.controller.yearMax],
                     rangeSlider: true,
                     max: 2021,
                     min: 1950,
                     handler: FlutterSliderHandler(
-                      child: Text("'${"$_lowerYear".substring(2, 4)}", style: bookTitleStyle.copyWith(fontSize: 18)),
+                      child: Text("'${"${widget.controller.yearMin}".substring(2, 4)}",
+                          style: bookTitleStyle.copyWith(fontSize: 18)),
                       decoration: handleDecor,
                     ),
                     rightHandler: FlutterSliderHandler(
-                      child: Text("'${"$_upperYear".substring(2, 4)}", style: bookTitleStyle.copyWith(fontSize: 18)),
+                      child: Text("'${"${widget.controller.yearMax}".substring(2, 4)}",
+                          style: bookTitleStyle.copyWith(fontSize: 18)),
                       decoration: handleDecor,
                     ),
                     hatchMark: FlutterSliderHatchMark(
@@ -327,8 +314,8 @@ class _SearchFiltersState extends State<SearchFilters> {
                       smallLine: FlutterSliderSizedBox(width: 1, height: 1),
                     ),
                     onDragging: (handlerIndex, lowerValue, upperValue) {
-                      _lowerYear = lowerValue;
-                      _upperYear = upperValue;
+                      widget.controller.yearMin = lowerValue;
+                      widget.controller.yearMax = upperValue;
                       setState(() {});
                     },
                   ),
@@ -343,13 +330,13 @@ class _SearchFiltersState extends State<SearchFilters> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Genre", style: bookTitleStyle),
+                      Text("Weighting", style: bookTitleStyle),
                     ],
                   ),
                 ],
               ),
               collapsed: Container(),
-              expanded: GenreGrid(),
+              expanded: GenreGrid(widget.controller),
             ),
             Divider(color: Colors.black54),
             Center(
@@ -359,7 +346,7 @@ class _SearchFiltersState extends State<SearchFilters> {
                   fontSize: 40.0,
                   color: primaryColor,
                 ),
-                Text("Version 0.0.8", style: authorStyle)
+                Text("Version 1.0.0", style: authorStyle)
               ],
             )),
           ],
@@ -368,79 +355,123 @@ class _SearchFiltersState extends State<SearchFilters> {
 }
 
 class GenreGrid extends StatefulWidget {
+  GenreGrid(this.controller);
+  PageContrContr controller;
+
   @override
   _GenreGridState createState() => _GenreGridState();
 }
 
 class _GenreGridState extends State<GenreGrid> {
-  var allValues = {
-    "Action": false,
-    "Adventure": false,
-    "Biography": false,
-    "Children": false,
-    "Classic": false,
-    "Comedy/Humour": true,
-    "Detective": false,
-    "Drama": false,
-    "Education": true,
-    "Fantasy": false,
-    "Fiction": false,
-    "History": false,
-    "Horror": false,
-    "Mystery": false,
-    "Non-fiction": false,
-    "Politics": false,
-    "Romance": false,
-    "Scientific": false,
-    "Sci-fi": false,
-    "Young Adult": false,
-  };
-
   @override
   Widget build(BuildContext context) {
-    var numRows = allValues.keys.length ~/ 2;
-    List<Widget> columns = [];
-    for (int j = 0; j < 2; j++) {
-      List<Widget> rows = [];
-      for (int i = 0; i < numRows; i++) {
-        var key = allValues.keys.toList()[i + numRows * j];
-        rows.add(Row(children: [
-          Checkbox(
-              checkColor: offWhite,
-              activeColor: primaryColor,
-              value: allValues[key],
-              onChanged: (newV) {
-                allValues[key] = newV;
-                setState(() {});
-              }),
-          Text(key, style: authorStyle),
-        ]));
-      }
-      columns.add(Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: rows,
-      ));
-    }
-
-    return Row(
-      children: columns,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Semantic Weight",
+          style: authorStyle,
+        ),
+        FlutterSlider(
+          tooltip: FlutterSliderTooltip(disabled: true),
+          values: [widget.controller.semWeight],
+          max: 10.0,
+          min: 0.0,
+          handler: FlutterSliderHandler(
+            child: Text("${widget.controller.semWeight / 10}", style: bookTitleStyle.copyWith(fontSize: 18)),
+            decoration: handleDecor,
+          ),
+          hatchMark: FlutterSliderHatchMark(
+            density: 0.5,
+            displayLines: true,
+            smallLine: FlutterSliderSizedBox(width: 1, height: 1),
+          ),
+          onDragging: (handlerIndex, lowerValue, upperValue) {
+            widget.controller.semWeight = lowerValue;
+            setState(() {});
+          },
+        ),
+        Text(
+          "Exact Weight",
+          style: authorStyle,
+        ),
+        FlutterSlider(
+          tooltip: FlutterSliderTooltip(disabled: true),
+          values: [widget.controller.exactWeight],
+          max: 10.0,
+          min: 0.0,
+          handler: FlutterSliderHandler(
+            child: Text("${widget.controller.exactWeight / 10}", style: bookTitleStyle.copyWith(fontSize: 18)),
+            decoration: handleDecor,
+          ),
+          hatchMark: FlutterSliderHatchMark(
+            density: 0.5,
+            displayLines: true,
+            smallLine: FlutterSliderSizedBox(width: 1, height: 1),
+          ),
+          onDragging: (handlerIndex, lowerValue, upperValue) {
+            widget.controller.exactWeight = lowerValue;
+            setState(() {});
+          },
+        ),
+        Text(
+          "Sentiment Weight",
+          style: authorStyle,
+        ),
+        FlutterSlider(
+          tooltip: FlutterSliderTooltip(disabled: true),
+          values: [widget.controller.senWeight],
+          max: 10.0,
+          min: 0.0,
+          handler: FlutterSliderHandler(
+            child: Text("${widget.controller.senWeight / 10}", style: bookTitleStyle.copyWith(fontSize: 18)),
+            decoration: handleDecor,
+          ),
+          hatchMark: FlutterSliderHatchMark(
+            density: 0.5,
+            displayLines: true,
+            smallLine: FlutterSliderSizedBox(width: 1, height: 1),
+          ),
+          onDragging: (handlerIndex, lowerValue, upperValue) {
+            widget.controller.senWeight = lowerValue;
+            setState(() {});
+          },
+        ),
+      ],
     );
   }
 }
 
 class SearchResultsList extends StatelessWidget {
-  SearchResultsList(this.results);
+  SearchResultsList(this.results, this.controller);
   List<QueryResultEntry> results;
+  PageContrContr controller;
 
   @override
   Widget build(BuildContext context) {
+    print("${controller.sentiment} ${controller.confidence}");
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: results.asMap().entries.map((entry) {
-        int idx = entry.key;
-        var e = entry.value;
-        return BookPanel(idx == results.length - 1, e);
-      }).toList(),
+      children: [
+        if (controller.confidence > 0.6)
+          Container(
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(color: offWhite, borderRadius: BorderRadius.all(Radius.circular(10))),
+            child: Center(
+                child: Text(
+              "BetterReads detected ${controller.sentiment > 2.5 ? "positive" : "negative"} sentiment in your search.",
+              style: authorStyle,
+            )),
+          ),
+        if (controller.confidence > 0.6) SizedBox(height: 20),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: results.asMap().entries.map((entry) {
+            int idx = entry.key;
+            var e = entry.value;
+            return BookPanel(idx == results.length - 1, e);
+          }).toList(),
+        ),
+      ],
     );
   }
 }
@@ -454,18 +485,11 @@ Widget starSideGreyBox(QueryResultEntry e, bool isExpanded) {
           borderRadius: BorderRadius.all(Radius.circular(10))),
       duration: Duration(milliseconds: 200),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           starWidget(e.avgRating),
           Text("${e.avgRating}/5", style: quoteStyle),
           Text("(${oCcy.format(e.numReviews)} reviews)", style: reviewsStyle),
-          Wrap(
-            children: [
-              Text("Ranked ", style: genreStyle),
-              Text("#${e.genreRanking} ", style: boldGenreStyle),
-              Text("in ", style: genreStyle),
-              Text("${e.genre}", style: boldGenreStyle),
-            ],
-          ),
         ],
       ));
 }
@@ -532,7 +556,6 @@ class _BookPanelState extends State<BookPanel> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraint) {
-      bool canExpand = true;
       List<Widget> children = [];
       int i = 0;
       for (var r in widget.e.reviews) {
@@ -548,7 +571,7 @@ class _BookPanelState extends State<BookPanel> with TickerProviderStateMixin {
         }
         // newText = newText.substring(0, newStart) + "<bold>" + r.foundText + "</bold>" + newText.substring(newEnd);
         children.add(ConstrainedBox(
-          constraints: BoxConstraints(minHeight: 100),
+          constraints: BoxConstraints(minHeight: 100, minWidth: 1000),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 2.0),
             child: SelectableText.rich(
@@ -634,27 +657,32 @@ class _BookPanelState extends State<BookPanel> with TickerProviderStateMixin {
               SizedBox(width: 10),
               Expanded(
                   flex: 3,
-                  child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    starSideGreyBox(widget.e, isExpanded),
-                    Expanded(child: Container()),
-                    if (canExpand)
-                      Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 15.0, 0, 5.0),
-                          child: TextButton(
-                            onPressed: () {
-                              setState(() {
-                                isExpanded = !isExpanded;
-                              });
-                            },
-                            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                              Text(isExpanded ? "Collapse" : "Expand", style: expandStyle),
-                              SizedBox(width: 5),
-                              Icon(
-                                  isExpanded ? Icons.remove_circle_outline_outlined : Icons.add_circle_outline_outlined,
-                                  color: primaryColor)
-                            ]),
-                          )),
-                  ])),
+                  child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(flex: 1, child: Container()),
+                        Expanded(flex: 5, child: starSideGreyBox(widget.e, isExpanded)),
+                        Expanded(flex: 1, child: Container()),
+                        Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 15.0, 0, 5.0),
+                            child: TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  isExpanded = !isExpanded;
+                                });
+                              },
+                              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                Text(isExpanded ? "Collapse" : "Expand", style: expandStyle),
+                                SizedBox(width: 5),
+                                Icon(
+                                    isExpanded
+                                        ? Icons.remove_circle_outline_outlined
+                                        : Icons.add_circle_outline_outlined,
+                                    color: primaryColor)
+                              ]),
+                            )),
+                      ])),
             ],
           ),
         ),

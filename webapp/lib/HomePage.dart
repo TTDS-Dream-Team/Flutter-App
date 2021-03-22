@@ -5,28 +5,32 @@ import 'custom_dropdown.dart';
 import 'main.dart';
 
 class SearchSortDropdown extends StatefulWidget {
+  SearchSortDropdown(this.controller);
+  PageContrContr controller;
+
   @override
   _SearchSortDropdownState createState() => _SearchSortDropdownState();
 }
 
 class _SearchSortDropdownState extends State<SearchSortDropdown> {
-  int _checkboxValue = 0;
-
   @override
   Widget build(BuildContext context) {
     return CustomDropdown(
-      borderRadius: 5.0,
-      valueIndex: _checkboxValue,
-      hint: "Hint",
-      items: [
-        CustomDropdownItem(text: "Popularity"),
-        CustomDropdownItem(text: "Rating (Asc)"),
-        CustomDropdownItem(text: "Rating (Desc)"),
-      ],
-      onChanged: (newValue) {
-        setState(() => _checkboxValue = newValue);
-      },
-    );
+        borderRadius: 5.0,
+        valueIndex: widget.controller.sort,
+        hint: "Hint",
+        items: [
+          CustomDropdownItem(text: "Relevance"),
+          CustomDropdownItem(text: "Popularity"),
+          CustomDropdownItem(text: "Rating (Asc)"),
+          CustomDropdownItem(text: "Rating (Desc)"),
+        ],
+        onChanged: (newValue) {
+          setState(() {
+            widget.controller.sort = newValue;
+            widget.controller.reSearch();
+          });
+        });
   }
 }
 
@@ -88,40 +92,40 @@ class HomePage extends StatelessWidget {
             child: Searchbar((String string) {
               controller.search(string);
             }, controller.txt)),
-        SizedBox(height: 50),
+        SizedBox(height: 20),
         Row(
-          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            HomepageButton(
-                controller,
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Center(child: starWidget(5)),
-                    Text(
-                      "View highest rated all time",
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headline6,
-                    ),
-                  ],
-                )),
-            SizedBox(width: 50),
-            HomepageButton(
-                controller,
-                Text(
-                  "Find popular phrases by genre",
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headline6,
-                )),
-            SizedBox(width: 50),
-            HomepageButton(
-                controller,
-                Text(
-                  "Any other features we might want to add",
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headline6,
-                ))
+            Text(
+              "Search for books by how people reviewed them. For example '",
+              style: Theme.of(context).textTheme.headline6.copyWith(color: offWhite, fontSize: 18),
+            ),
+            TextButton(
+              onPressed: () {
+                controller.search("a waste of time");
+              },
+              child: Text(
+                "a waste of time",
+                style: Theme.of(context).textTheme.headline6.copyWith(color: primaryColorLight, fontSize: 18),
+              ),
+            ),
+            Text(
+              "' or '",
+              style: Theme.of(context).textTheme.headline6.copyWith(color: offWhite, fontSize: 18),
+            ),
+            TextButton(
+              onPressed: () {
+                controller.search("extremely good");
+              },
+              child: Text(
+                "extremely good",
+                style: Theme.of(context).textTheme.headline6.copyWith(color: primaryColorLight, fontSize: 18),
+              ),
+            ),
+            Text(
+              "'",
+              style: Theme.of(context).textTheme.headline6.copyWith(color: offWhite, fontSize: 18),
+            ),
           ],
         )
       ],
