@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'BetterReads',
       theme: ThemeData(
         brightness: Brightness.dark,
         primaryColor: primaryColor,
@@ -70,6 +70,7 @@ class PageContrContr {
   var confidence = -1.0;
   var sort = 0;
   var txt = TextEditingController();
+  var totalTime = 0.0;
 
   Function() resetSwitch;
 

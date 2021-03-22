@@ -43,7 +43,7 @@ class _SearchResultsState extends State<SearchResults> {
         break;
     }
     var searchString = 'search/${widget.controller.searchString}?'
-        'measure_time=false'
+        'measure_time=true'
         '&semantic_weight=${widget.controller.semWeight / 10}'
         '&exact_weight=${widget.controller.exactWeight / 10}'
         '&sentiment_weight=${widget.controller.senWeight / 10}'
@@ -52,7 +52,7 @@ class _SearchResultsState extends State<SearchResults> {
         '&rating_max=${widget.controller.ratingMax / 2}'
         '&year_min=${widget.controller.yearMin}'
         '&year_max=${widget.controller.yearMax}'
-        '&result_number=10'
+        '&result_number=100'
         '&sort=$sort';
 
     return Center(
@@ -112,10 +112,7 @@ class _SearchResultsState extends State<SearchResults> {
             child: Listener(
                 onPointerSignal: (ps) {
                   if (ps is PointerScrollEvent) {
-                    int speed = 130;
-                    if (ps.scrollDelta.dy < 0) {
-                      speed *= -1;
-                    }
+                    var speed = 1.0 * ps.scrollDelta.dy;
 
                     final newOffset = _controller.offset + speed;
                     if (ps.scrollDelta.dy.isNegative) {
@@ -233,6 +230,19 @@ class _SearchFiltersState extends State<SearchFilters> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Center(
+              child: Text(
+                "Filters",
+                style: bookTitleStyle,
+              ),
+            ),
+            Center(
+              child: Text(
+                "Change the filters to refine your search.",
+                style: authorStyle,
+              ),
+            ),
+            Divider(color: Colors.black54),
             ExpandablePanel(
               header: Column(
                 children: [
@@ -271,6 +281,9 @@ class _SearchFiltersState extends State<SearchFilters> {
                   widget.controller.ratingMin = lowerValue;
                   widget.controller.ratingMax = upperValue;
                   setState(() {});
+                },
+                onDragCompleted: (a, b, c) {
+                  widget.controller.reSearch();
                 },
               ),
             ),
@@ -318,6 +331,9 @@ class _SearchFiltersState extends State<SearchFilters> {
                       widget.controller.yearMax = upperValue;
                       setState(() {});
                     },
+                    onDragCompleted: (a, b, c) {
+                      widget.controller.reSearch();
+                    },
                   ),
                 ],
               ),
@@ -346,7 +362,7 @@ class _SearchFiltersState extends State<SearchFilters> {
                   fontSize: 40.0,
                   color: primaryColor,
                 ),
-                Text("Version 1.0.0", style: authorStyle)
+                Text("Version 1.0.1", style: authorStyle)
               ],
             )),
           ],
@@ -390,6 +406,9 @@ class _GenreGridState extends State<GenreGrid> {
             widget.controller.semWeight = lowerValue;
             setState(() {});
           },
+          onDragCompleted: (a, b, c) {
+            widget.controller.reSearch();
+          },
         ),
         Text(
           "Exact Weight",
@@ -412,6 +431,9 @@ class _GenreGridState extends State<GenreGrid> {
           onDragging: (handlerIndex, lowerValue, upperValue) {
             widget.controller.exactWeight = lowerValue;
             setState(() {});
+          },
+          onDragCompleted: (a, b, c) {
+            widget.controller.reSearch();
           },
         ),
         Text(
@@ -436,40 +458,101 @@ class _GenreGridState extends State<GenreGrid> {
             widget.controller.senWeight = lowerValue;
             setState(() {});
           },
+          onDragCompleted: (a, b, c) {
+            widget.controller.reSearch();
+          },
         ),
       ],
     );
   }
 }
 
-class SearchResultsList extends StatelessWidget {
+class SearchResultsList extends StatefulWidget {
   SearchResultsList(this.results, this.controller);
   List<QueryResultEntry> results;
   PageContrContr controller;
 
   @override
+  _SearchResultsListState createState() => _SearchResultsListState();
+}
+
+class _SearchResultsListState extends State<SearchResultsList> {
+  var numberShown = 10;
+
+  @override
   Widget build(BuildContext context) {
-    print("${controller.sentiment} ${controller.confidence}");
+    print("${widget.controller.sentiment} ${widget.controller.confidence}");
     return Column(
       children: [
-        if (controller.confidence > 0.6)
-          Container(
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(color: offWhite, borderRadius: BorderRadius.all(Radius.circular(10))),
-            child: Center(
-                child: Text(
-              "BetterReads detected ${controller.sentiment > 2.5 ? "positive" : "negative"} sentiment in your search.",
-              style: authorStyle,
-            )),
-          ),
-        if (controller.confidence > 0.6) SizedBox(height: 20),
+        Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(color: offWhite, borderRadius: BorderRadius.all(Radius.circular(10))),
+          child: Center(
+              child: Column(
+            children: [
+              Text(
+                "Searched 69,604,548 reviews in ${(widget.controller.totalTime / 1000.0).toStringAsPrecision(3)} seconds",
+                style: authorStyle,
+              ),
+              if (widget.controller.confidence > 0.6)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "BetterReads detected ",
+                      style: authorStyle,
+                    ),
+                    Text(
+                      "${widget.controller.sentiment > 2.5 ? "positive" : "negative"}",
+                      style: authorStyle.copyWith(color: widget.controller.sentiment > 2.5 ? Colors.green : Colors.red),
+                    ),
+                    Text(
+                      " sentiment in your search.",
+                      style: authorStyle,
+                    )
+                  ],
+                ),
+            ],
+          )),
+        ),
+        SizedBox(height: 20),
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: results.asMap().entries.map((entry) {
-            int idx = entry.key;
-            var e = entry.value;
-            return BookPanel(idx == results.length - 1, e);
-          }).toList(),
+          children: widget.results
+              .asMap()
+              .entries
+              .map((entry) {
+                int idx = entry.key;
+                var e = entry.value;
+                return BookPanel(idx == widget.results.length - 1, e);
+              })
+              .toList()
+              .getRange(0, min(numberShown, 100))
+              .toList(),
+        ),
+        Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(color: offWhite, borderRadius: BorderRadius.all(Radius.circular(10))),
+          child: Center(
+              child: Column(
+            children: [
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    numberShown += 10;
+                  });
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Show More", style: expandStyle),
+                    SizedBox(width: 5),
+                    Icon(Icons.add_circle_outline_outlined, color: primaryColor)
+                  ],
+                ),
+              ),
+            ],
+          )),
         ),
       ],
     );
@@ -487,7 +570,10 @@ Widget starSideGreyBox(QueryResultEntry e, bool isExpanded) {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          starWidget(e.avgRating),
+          Text("Review Rating", style: quoteStyle),
+          starWidget(e.reviews[0].reviewRating.toDouble(), textColor),
+          Text("Book Rating", style: quoteStyle),
+          starWidget(e.avgRating, primaryColor),
           Text("${e.avgRating}/5", style: quoteStyle),
           Text("(${oCcy.format(e.numReviews)} reviews)", style: reviewsStyle),
         ],
@@ -661,9 +747,7 @@ class _BookPanelState extends State<BookPanel> with TickerProviderStateMixin {
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Expanded(flex: 1, child: Container()),
                         Expanded(flex: 5, child: starSideGreyBox(widget.e, isExpanded)),
-                        Expanded(flex: 1, child: Container()),
                         Padding(
                             padding: const EdgeInsets.fromLTRB(0, 15.0, 0, 5.0),
                             child: TextButton(

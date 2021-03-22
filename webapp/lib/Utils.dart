@@ -17,14 +17,14 @@ class Logo extends StatelessWidget {
   }
 }
 
-Widget starWidget(double rating) {
+Widget starWidget(double rating, Color colour) {
   List<Widget> stars = [];
   for (int i = 0; i < 5; i++) {
     stars.add(Icon(
         rating <= i + 0.25
             ? Icons.star_border
             : (rating < i + 0.75 && rating > i + 0.25 ? Icons.star_half : Icons.star),
-        color: primaryColor));
+        color: colour));
   }
   return Row(
     mainAxisAlignment: MainAxisAlignment.center,
@@ -36,10 +36,14 @@ Widget starWidget(double rating) {
 List<QueryResultEntry> getQueries(String response, PageContrContr controller) {
   Map<String, dynamic> responses = jsonDecode(response);
   List<QueryResultEntry> toRet = [];
-  for (var r in responses.keys.toList()..sort()) {
+  for (var r in responses.keys.toList()) {
     if (r == "sentiment") {
       controller.sentiment = responses[r][0];
       controller.confidence = responses[r][1];
+      continue;
+    }
+    if (r == "timings") {
+      controller.totalTime = responses[r]["total"];
       continue;
     }
     try {
@@ -49,8 +53,8 @@ List<QueryResultEntry> getQueries(String response, PageContrContr controller) {
       List<ReviewResult> reviews = [];
       String text = res["review_text"];
       String relevantText = res["relevant_text"];
-      reviews.add(ReviewResult(
-          text, relevantText, text.indexOf(relevantText), text.indexOf(relevantText) + relevantText.length));
+      reviews.add(ReviewResult(text, relevantText, text.indexOf(relevantText),
+          text.indexOf(relevantText) + relevantText.length, res["rating"]));
       toRet.add(QueryResultEntry(
         int.parse(r) + 1,
         res["title"],
@@ -72,11 +76,12 @@ List<QueryResultEntry> getQueries(String response, PageContrContr controller) {
 }
 
 class ReviewResult {
-  ReviewResult(this.text, this.foundText, this.start, this.end);
+  ReviewResult(this.text, this.foundText, this.start, this.end, this.reviewRating);
   String foundText;
   String text;
   int start;
   int end;
+  int reviewRating;
 }
 
 class QueryResultEntry {
