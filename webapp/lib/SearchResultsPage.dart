@@ -569,7 +569,8 @@ Widget starSideGreyBox(QueryResultEntry e, bool isExpanded) {
           borderRadius: BorderRadius.all(Radius.circular(10))),
       duration: Duration(milliseconds: 200),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text("Review Rating", style: quoteStyle),
           starWidget(e.reviews[0].reviewRating.toDouble(), textColor),
@@ -748,7 +749,13 @@ class _BookPanelState extends State<BookPanel> with TickerProviderStateMixin {
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Expanded(flex: 5, child: starSideGreyBox(widget.e, isExpanded)),
+                        Expanded(
+                            flex: 5,
+                            child: Column(
+                              children: [
+                                starSideGreyBox(widget.e, isExpanded),
+                              ],
+                            )),
                         Padding(
                             padding: const EdgeInsets.fromLTRB(0, 15.0, 0, 5.0),
                             child: Row(
