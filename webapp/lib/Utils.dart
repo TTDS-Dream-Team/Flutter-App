@@ -65,6 +65,7 @@ List<QueryResultEntry> getQueries(String response, PageContrContr controller) {
         "No Genre",
         1,
         res["image_url"],
+        res["url"],
         reviews,
       ));
     } catch (e) {
@@ -86,7 +87,7 @@ class ReviewResult {
 
 class QueryResultEntry {
   QueryResultEntry(this.searchResultNum, this.title, this.author, this.year, this.avgRating, this.numReviews,
-      this.genre, this.genreRanking, this.imageURL, this.reviews);
+      this.genre, this.genreRanking, this.imageURL, this.URL, this.reviews);
   int searchResultNum;
   String title;
   String author;
@@ -96,5 +97,6 @@ class QueryResultEntry {
   String genre;
   int genreRanking;
   String imageURL;
+  String URL;
   List<ReviewResult> reviews;
 }

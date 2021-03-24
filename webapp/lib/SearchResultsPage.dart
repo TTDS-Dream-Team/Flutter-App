@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'HomePage.dart';
 import 'Utils.dart';
@@ -362,7 +363,7 @@ class _SearchFiltersState extends State<SearchFilters> {
                   fontSize: 40.0,
                   color: primaryColor,
                 ),
-                Text("Version 1.0.1", style: authorStyle)
+                Text("Version 1.0.2", style: authorStyle)
               ],
             )),
           ],
@@ -750,21 +751,33 @@ class _BookPanelState extends State<BookPanel> with TickerProviderStateMixin {
                         Expanded(flex: 5, child: starSideGreyBox(widget.e, isExpanded)),
                         Padding(
                             padding: const EdgeInsets.fromLTRB(0, 15.0, 0, 5.0),
-                            child: TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  isExpanded = !isExpanded;
-                                });
-                              },
-                              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                                Text(isExpanded ? "Collapse" : "Expand", style: expandStyle),
-                                SizedBox(width: 5),
-                                Icon(
-                                    isExpanded
-                                        ? Icons.remove_circle_outline_outlined
-                                        : Icons.add_circle_outline_outlined,
-                                    color: primaryColor)
-                              ]),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(width: 25),
+                                TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      isExpanded = !isExpanded;
+                                    });
+                                  },
+                                  child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                    Text(isExpanded ? "Collapse" : "Expand  ", style: expandStyle),
+                                    SizedBox(width: 5),
+                                    Icon(
+                                        isExpanded
+                                            ? Icons.remove_circle_outline_outlined
+                                            : Icons.add_circle_outline_outlined,
+                                        color: primaryColor),
+                                  ]),
+                                ),
+                                FlatButton(
+                                    padding: EdgeInsets.all(0.0),
+                                    onPressed: () {
+                                      launch(widget.e.URL);
+                                    },
+                                    child: Image(height: 30, width: 30, image: AssetImage('assets/logo.png')))
+                              ],
                             )),
                       ])),
             ],

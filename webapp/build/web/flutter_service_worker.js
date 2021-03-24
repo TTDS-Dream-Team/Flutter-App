@@ -3,21 +3,22 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 const RESOURCES = {
-  "assets/AssetManifest.json": "b146031e32fd95c00083f0f7434cd55e",
+  "assets/AssetManifest.json": "e4ad3a9bfc2faafce45d7075490441b0",
 "assets/assets/Background.png": "5822ef4b127568524fe8179e91af5fd2",
 "assets/assets/ChamberOfSecrets.jpeg": "801101c86ab12f9d622a42707fdd6868",
+"assets/assets/logo.png": "78268056c730b08c1d52964f5ce8df95",
 "assets/assets/ThursdayMurderClub.jpeg": "f5158b5691e26794ac409bfb7587882e",
 "assets/FontManifest.json": "dc3d03800ccca4601324923c0b1d6d57",
 "assets/fonts/MaterialIcons-Regular.otf": "1288c9e28052e028aba623321f7826ac",
-"assets/NOTICES": "b36f804cc8362e4b08587c44887a8abc",
+"assets/NOTICES": "9d7fcb9723811922dc12029443222aec",
 "assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "6d342eb68f170c97609e9da345464e5e",
 "favicon%20big.png": "79111e15d1236d7d669d7f5f5b95ab98",
 "favicon.png": "c08eb55ba86cfb35d5ae9e4e79df88ec",
 "icons/Icon-192.png": "ac9a721a12bbc803b44f645561ecb1e1",
 "icons/Icon-512.png": "96e752610906ba2a93c65f8abe1645f1",
-"index.html": "80d49ce48b10ac79ac67e1c8d77e62d9",
-"/": "80d49ce48b10ac79ac67e1c8d77e62d9",
-"main.dart.js": "0bff9c917b627abf376ce5b8d621984a",
+"index.html": "d44e9eba22a460d400e394131cbf69a7",
+"/": "d44e9eba22a460d400e394131cbf69a7",
+"main.dart.js": "a82918fc46c6f2a088f7ee4deb690c5a",
 "manifest.json": "d40331d286e426f364f31717c566a2ae",
 "version.json": "241f4a42b47957020519cd2a4cf2c7a2"
 };

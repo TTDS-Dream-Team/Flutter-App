@@ -22,7 +22,7 @@ Color textFadedColor = Color(0xFF7484bB);
 Color offWhite = Color(0xFFfbfbfb);
 double cornerRadius = 25;
 
-final numberStyle = TextStyle(fontSize: 14.0, fontStyle: FontStyle.italic, color: textColor)
+final numberStyle = TextStyle(fontSize: 14.0, fontStyle: FontStyle.italic, color: textColor, height: 1.1)
     .copyWith(fontSize: 30, fontStyle: FontStyle.normal);
 final bookTitleStyle = numberStyle.copyWith(fontSize: 22, fontStyle: FontStyle.normal, color: Colors.black);
 final authorStyle = numberStyle.copyWith(fontSize: 17, fontStyle: FontStyle.normal);
