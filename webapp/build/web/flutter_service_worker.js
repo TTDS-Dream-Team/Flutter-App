@@ -6,7 +6,7 @@ const RESOURCES = {
   "assets/AssetManifest.json": "e4ad3a9bfc2faafce45d7075490441b0",
 "assets/assets/Background.png": "5822ef4b127568524fe8179e91af5fd2",
 "assets/assets/ChamberOfSecrets.jpeg": "801101c86ab12f9d622a42707fdd6868",
-"assets/assets/logo.png": "78268056c730b08c1d52964f5ce8df95",
+"assets/assets/logo.png": "a6df059451c00ba76d4e655e02ed2550",
 "assets/assets/ThursdayMurderClub.jpeg": "f5158b5691e26794ac409bfb7587882e",
 "assets/FontManifest.json": "dc3d03800ccca4601324923c0b1d6d57",
 "assets/fonts/MaterialIcons-Regular.otf": "1288c9e28052e028aba623321f7826ac",
@@ -16,9 +16,9 @@ const RESOURCES = {
 "favicon.png": "c08eb55ba86cfb35d5ae9e4e79df88ec",
 "icons/Icon-192.png": "ac9a721a12bbc803b44f645561ecb1e1",
 "icons/Icon-512.png": "96e752610906ba2a93c65f8abe1645f1",
-"index.html": "55e16cb8f15a149d9ef580855f91bb20",
-"/": "55e16cb8f15a149d9ef580855f91bb20",
-"main.dart.js": "a1eaa1f8c545dc02a90c5ac45790b316",
+"index.html": "2efdc8fdd6b2bd125e594f204b1ff5ba",
+"/": "2efdc8fdd6b2bd125e594f204b1ff5ba",
+"main.dart.js": "cfaaf23d85191ae37c118369e1b3da26",
 "manifest.json": "d40331d286e426f364f31717c566a2ae",
 "version.json": "241f4a42b47957020519cd2a4cf2c7a2"
 };

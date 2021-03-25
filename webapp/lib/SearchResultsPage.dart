@@ -363,7 +363,7 @@ class _SearchFiltersState extends State<SearchFilters> {
                   fontSize: 40.0,
                   color: primaryColor,
                 ),
-                Text("Version 1.0.2", style: authorStyle)
+                Text("Version 1.0.4", style: authorStyle)
               ],
             )),
           ],
@@ -517,6 +517,20 @@ class _SearchResultsListState extends State<SearchResultsList> {
           )),
         ),
         SizedBox(height: 20),
+        if (widget.results.isEmpty)
+          Container(
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(color: offWhite, borderRadius: BorderRadius.all(Radius.circular(10))),
+            child: Center(
+                child: Column(
+              children: [
+                Text(
+                  "Sorry, there are no reviews with your specific filters. Try changing the filters on the left-hand side to see more results.",
+                  style: authorStyle,
+                )
+              ],
+            )),
+          ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: widget.results
@@ -528,33 +542,34 @@ class _SearchResultsListState extends State<SearchResultsList> {
                 return BookPanel(idx == widget.results.length - 1, e);
               })
               .toList()
-              .getRange(0, min(numberShown, 100))
+              .getRange(0, min(numberShown, widget.results.length))
               .toList(),
         ),
-        Container(
-          padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(color: offWhite, borderRadius: BorderRadius.all(Radius.circular(10))),
-          child: Center(
-              child: Column(
-            children: [
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    numberShown += 10;
-                  });
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("Show More", style: expandStyle),
-                    SizedBox(width: 5),
-                    Icon(Icons.add_circle_outline_outlined, color: primaryColor)
-                  ],
+        if (numberShown < widget.results.length)
+          Container(
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(color: offWhite, borderRadius: BorderRadius.all(Radius.circular(10))),
+            child: Center(
+                child: Column(
+              children: [
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      numberShown += 10;
+                    });
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Show More", style: expandStyle),
+                      SizedBox(width: 5),
+                      Icon(Icons.add_circle_outline_outlined, color: primaryColor)
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          )),
-        ),
+              ],
+            )),
+          ),
       ],
     );
   }
@@ -607,7 +622,7 @@ Widget bookPanelContainer(TickerProvider vsync, bool isLast, int idx, Widget chi
           ],
         ),
       ),
-      if (!isLast) SizedBox(height: 20)
+      SizedBox(height: 20)
     ],
   );
 }
@@ -727,7 +742,11 @@ class _BookPanelState extends State<BookPanel> with TickerProviderStateMixin {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Text("${widget.e.year}${widget.e.author}", style: authorStyle),
+                    if (widget.e.author != "No author" && widget.e.year.length == 0)
+                      Text("${widget.e.author}", style: authorStyle),
+                    if (widget.e.author != "No author" && widget.e.year.length != 0)
+                      Text("${widget.e.year}, ${widget.e.author}", style: authorStyle),
+                    if (widget.e.author == "No author") Text("${widget.e.year}", style: authorStyle),
                     Container(
                       decoration:
                           BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(10)), color: Colors.grey[100]),
@@ -783,7 +802,7 @@ class _BookPanelState extends State<BookPanel> with TickerProviderStateMixin {
                                     onPressed: () {
                                       launch(widget.e.URL);
                                     },
-                                    child: Image(height: 30, width: 30, image: AssetImage('assets/logo.png')))
+                                    child: Image(width: 30, height: 30, image: AssetImage('assets/logo.png')))
                               ],
                             )),
                       ])),

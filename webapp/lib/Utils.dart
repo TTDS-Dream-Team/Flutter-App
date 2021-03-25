@@ -49,7 +49,6 @@ List<QueryResultEntry> getQueries(String response, PageContrContr controller) {
     try {
       var res = responses[r];
       String yearPublished = res["publication_year"];
-      if (yearPublished.length != 0) yearPublished = yearPublished + ", ";
       List<ReviewResult> reviews = [];
       String text = res["review_text"];
       String relevantText = res["relevant_text"];
